@@ -1,12 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet , View , Text } from 'react-native';
+import MapScreen from './Screens/MapScreen';
+import Login from './Screens/Login';
+import {useState} from 'react'
+import NewListingScreen from './Screens/NewListingScreen';
+import { NavigationContainer } from '@react-navigation/native'
+import HomeStack from './routes/homeStack'
+import Stack from './routes/homeStack';
+import { NativeBaseProvider, Box } from "native-base";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NativeBaseProvider >
+        <NavigationContainer >
+            <Stack/>
+        </NavigationContainer>
+    </NativeBaseProvider>
   );
 }
 
