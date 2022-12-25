@@ -4,6 +4,7 @@ import MapView from 'react-native-maps'
 import { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 import markerList from '../fakeLocations.json'
+import markerListSorted from '../sortedLocations.json'
 import LocationCardsMenu from "../components/LocationCardsMenu";
 
 
@@ -13,6 +14,7 @@ export default function MapScreen (){
   const [selectedPin, setSelectedPin] = useState({});
   const [markers, setMarkers] = useState(markerList ? markerList : []); // initial markers state 
   const [location, setLocation] = useState({});
+  const [sortType, setSortType] = useState("location")
 
   useEffect(() => {
     (async () => {
@@ -29,11 +31,24 @@ export default function MapScreen (){
         console.log(error);
       }
     })();
+  
+  //deciding what markers array to show 
+  if (sortType === 'locations'){
+    setMarkers(markerList)
+  } else {
+    setMarkers(markerListSorted)
+  }
+
+  
   }, []);
 
 
    const onMarkerPress = (e)=>{
     setSelectedPin(e.nativeEvent.coordinate)
+   }
+
+   const onLocationSort = (e)=>{
+    setMarkers(markerListSorted)
    }
 
   return(
@@ -65,7 +80,7 @@ export default function MapScreen (){
             />
         )):[]}
       </MapView>
-     <LocationCardsMenu markers={markers ? markers : []}></LocationCardsMenu>
+     <LocationCardsMenu markers={markers ? markers : []} onSort={onLocationSort}></LocationCardsMenu>
     </View>
   )
 }
