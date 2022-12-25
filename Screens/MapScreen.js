@@ -1,4 +1,5 @@
-import { StyleSheet, View  } from "react-native"
+import { StyleSheet, Fab , Icon,Pressable } from "react-native"
+import {View} from "native-base"
 import {useState , useEffect} from 'react'
 import MapView from 'react-native-maps'
 import { Marker } from "react-native-maps";
@@ -6,6 +7,7 @@ import * as Location from 'expo-location';
 import markerList from '../fakeLocations.json'
 import markerListSorted from '../sortedLocations.json'
 import LocationCardsMenu from "../components/LocationCardsMenu";
+import MenuComponent from "../components/Menu"
 
 
 export default function MapScreen (){
@@ -80,7 +82,9 @@ export default function MapScreen (){
             />
         )):[]}
       </MapView>
-     <LocationCardsMenu markers={markers ? markers : []} onSort={onLocationSort}></LocationCardsMenu>
+       
+     <MenuComponent></MenuComponent>
+     <LocationCardsMenu> </LocationCardsMenu>
     </View>
   )
 }
