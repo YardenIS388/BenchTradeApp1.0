@@ -1,18 +1,22 @@
-import {useState} from 'react'
-import {SafeAreaView, TextInput,StyleSheet,Image, Pressable,View} from 'react-native'
-import {Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text, AspectRatio } from 'native-base'
+import {useState, useContext} from 'react'
+import {SafeAreaView,Image} from 'react-native'
+import {useToast,Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text, AspectRatio } from 'native-base'
+import {UserContext} from "../context/authentication.context"
 
+export default function LoginScreen () {
 
-export default function LoginScreen ({navigation}) {
- 
+    const {login} = useContext(UserContext)
     const [loginData,    setLoginData]    = useState({})
-
+    const [message, setMessage] = useState ("")
+    
+    const loginErrorToast = useToast()
 
     const loginHandler = (e) => {
         if(loginData){
             //TODO: this will be the part where I check if the password and email match the database
             console.log({loginData})
-            navigation.navigate('MapScreen')
+            
+            loginData.email ? login(loginData.email) : loginErrorToast.show({ description: "Seems there was an error with your login information" })
         }
         else{
             setLoginData(null)

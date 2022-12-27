@@ -1,21 +1,19 @@
-import { StyleSheet , View , Text } from 'react-native';
-import MapScreen from './Screens/MapScreen';
-import Login from './Screens/Login';
-import {useState} from 'react'
-import NewListingScreen from './Screens/NewListingScreen';
-import { NavigationContainer } from '@react-navigation/native'
-import HomeStack from './routes/homeStack'
-import Stack from './routes/homeStack';
-import { NativeBaseProvider, Box } from "native-base";
-
+import { StyleSheet} from 'react-native';
+import { NativeBaseProvider} from "native-base";
+import { NavigationContainer } from "@react-navigation/native";
+import AuthStack from "./routes/authStack"
+import { UserProvider } from './context/authentication.context';
 export default function App() {
+
   return (
-    <NativeBaseProvider >
-        <NavigationContainer >
-            <Stack/>
+    <UserProvider>
+      <NativeBaseProvider >
+        <NavigationContainer>
+          <AuthStack></AuthStack>
         </NavigationContainer>
-    </NativeBaseProvider>
-  );
+      </NativeBaseProvider>
+    </UserProvider>
+  )
 }
 
 const styles = StyleSheet.create({

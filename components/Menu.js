@@ -1,71 +1,47 @@
-import {
-  View,
-  Pressable,
-  Box,
-  Divider,
-  Menu,
-  Center,
-  Button,
-  PresenceTransition,
-  Text
-} from "native-base";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { View, Pressable } from "native-base";
+import { Link } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+
 
 const MenuComponent = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <>
+    <View
+      position="absolute"
+      top="5%"
+      left="0"
+      flexDirection="row"
+      alignContent="center"
+      m="3"
+      justifyContent="space-between"
+      borderWidth="1"
+    >
       <Pressable
-        onPress={() => setIsOpen(!isOpen)}
+        onPress={() => console.log("click")}
+        _pressed={{
+          shadow: "6",
+          bg: "light.200",
+        }}
         alignItems="center"
-        position="absolute"
-        top="5%"
-        left="5%"
         bg="white"
         borderRadius="full"
         p="3"
         shadow="3"
+       
       >
-        <SimpleLineIcons name="menu" size={22} color="black" />
+        <MaterialIcons name="menu-open" size={24} color="black" />
       </Pressable>
-      <Center>
-        <PresenceTransition
-          visible={isOpen}
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-            transition: {
-              duration: 250,
-            },
-          }}
+      <Link to={{ screen: "NewListing" }}>
+        <View
+          bg="white"
+          borderRadius="full"
+          p="3"
+          shadow="3"
         >
-          <Center
-            flex="1"
-            bottom="10%"
-            right="10%"
-            position="absolute"
-            bg="teal.500"
-            rounded="md"
-            w="250"
-            h="500"
-            _text={{
-              color: "white",
-            }}
-          >
-            <Box>
-                <Text> User</Text>
-                <Text> Logout</Text>
-                 
-            </Box>
-          </Center>
-        </PresenceTransition>
-      </Center>
-    </>
-  );
-};
+          <MaterialIcons name="post-add" size={24} color="black" />
+        </View>
+      </Link>
+    </View>
+  )
+}
 
 export default MenuComponent;

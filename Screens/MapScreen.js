@@ -34,14 +34,8 @@ export default function MapScreen (){
       }
     })();
   
-  //deciding what markers array to show 
-  if (sortType === 'locations'){
-    setMarkers(markerList)
-  } else {
-    setMarkers(markerListSorted)
-  }
+   setMarkers(markerList)
 
-  
   }, []);
 
 
@@ -49,9 +43,7 @@ export default function MapScreen (){
     setSelectedPin(e.nativeEvent.coordinate)
    }
 
-   const onLocationSort = (e)=>{
-    setMarkers(markerListSorted)
-   }
+
 
   return(
     <View style={styles.mapContainer}>
