@@ -1,4 +1,4 @@
-const usersRepository = require("./utils/userRepo.object");
+const usersRepository = require("../repositories/utils/userRepo.object");
 const { isValidObjectId } = require("./../validators/mongoId.validator");
 const registerValidator = require("./../validators/user.validator");
 const bcrypt = require("bcrypt");
