@@ -7,13 +7,13 @@ const MenuComponent = () => {
   return (
     <View
       position="absolute"
-      top="5%"
-      left="0"
+      top="6%"
+      left="4%"
       flexDirection="row"
       alignContent="center"
-      m="3"
       justifyContent="space-between"
-      borderWidth="1"
+      w="100"
+      
     >
       <Pressable
         onPress={() => console.log("click")}
@@ -24,22 +24,25 @@ const MenuComponent = () => {
         alignItems="center"
         bg="white"
         borderRadius="full"
-        p="3"
         shadow="3"
+        p="3"
+        m="1"
        
       >
         <MaterialIcons name="menu-open" size={24} color="black" />
       </Pressable>
-      <Link to={{ screen: "NewListing" }}>
-        <View
-          bg="white"
-          borderRadius="full"
-          p="3"
-          shadow="3"
-        >
-          <MaterialIcons name="post-add" size={24} color="black" />
-        </View>
-      </Link>
+
+      <View alignItems="center"
+            bg="white"
+            borderRadius="full"
+            shadow="3"
+            p="3"
+            m="1">
+            
+          <Link to={{ screen: "NewListing" }}>
+             <MaterialIcons name="post-add" size={24} color="black" />
+          </Link>
+      </View>
     </View>
   )
 }

@@ -11,10 +11,12 @@ export default function AuthStack() {
 
   const {user} = useContext(UserContext)
   
+  //TODO: load the actual variable to indicate sucssefull login 
+  const loggedIn = true
   
     
   return (
-    user.auth ? 
+    loggedIn ? 
 
     <Stack.Navigator initialRouteName="MapScreen">
       <Stack.Screen

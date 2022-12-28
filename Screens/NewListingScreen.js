@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import {ImageBackground} from 'react-native'
-import {Text,Heading , VStack,FormControl,Input,Button,Center,Select,CheckIcon, WarningOutlineIcon, NumberInputStepper, Pressable} from 'native-base'
+import {Image, Text,Heading , VStack,FormControl,Input,Button,Center,Select,CheckIcon, WarningOutlineIcon, NumberInputStepper, Pressable} from 'native-base'
 import { AntDesign } from '@expo/vector-icons';
 
 export default function NewListingScreen({navigation}) {
@@ -62,6 +62,8 @@ export default function NewListingScreen({navigation}) {
 
   return (
   <Center mt='100'>
+    <Image source={{uri:"../assets/images/AddListingBackDrop.png"}} alt="bg"
+            w="100%" h="100%"></Image>
     <VStack width="90%" mx="3" maxW="300px">
       <Heading mb='50'>Let's Create a New Listing!</Heading>
       <FormControl isRequired isInvalid={'listing-title' in errors}>
