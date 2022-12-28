@@ -13,11 +13,11 @@ export default function AuthStack() {
   
   //TODO: load the actual variable to indicate sucssefull login 
   const loggedIn = true
-  
+  console.log(user)
     
   return (
-    loggedIn ? 
-
+    user.auth ? 
+    //if user is authenticated 
     <Stack.Navigator initialRouteName="MapScreen">
       <Stack.Screen
         name="MapScreen"
@@ -36,7 +36,7 @@ export default function AuthStack() {
       />
     </Stack.Navigator>
     :
-    //if authData does not exist users will only be able to see the login screen 
+    //if user does not exist users will only be able to see the login screen 
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen
         name="Login"

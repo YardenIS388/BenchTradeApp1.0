@@ -15,18 +15,15 @@ export default function LoginScreen () {
 
 
     const loginHandler = async (e) => {
-        if(loginData){
            
+        const loginRequest =  axios.post(loginUrl, {email: loginData.email, password: loginData.password})
 
             console.log({loginData})
-            
-            loginData.email ? login(loginData.email) : loginErrorToast.show({ description: "Seems there was an error with your login information" })
-        }
-        else{
-            setLoginData(null)
-        }
+            console.log(loginRequest)
+            loginRequest ? login({name: loginData.email , token: loginRequest}) : loginErrorToast.show({ description: "Seems there was an error with your login information" }) 
     }
-    console.log({...loginData})
+
+   
     return(
     <SafeAreaView >
     <Center w="100%" pt='50'>
