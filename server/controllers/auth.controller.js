@@ -24,15 +24,27 @@ exports.authController = {
       existingUser.password
     );
     if (!isPasswordMatch) throw new RegisterError();
-    const user = { email: existingUser.email, fullName: existingUser.fullName };
+    const user = {
+      id: existingUser._id,
+      email: existingUser.email,
+      fullName: existingUser.fullName,
+    };
     const token = generateToken(user);
     res.status(200).json({ token });
+  },
+
+  getTokenInformation: async (req, res) => {
+    bodyValidator(req);
+    if (!req.body.token) throw new MissingPropertyError("token");
+    const { token } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ decoded });
   },
 };
 
 const generateToken = (user) => {
   const token = jwt.sign(
-    { id: user._id, fullName: user.fullName, email: user.email },
+    { id: user.id, fullName: user.fullName, email: user.email },
     process.env.JWT_SECRET
   );
   return token;
