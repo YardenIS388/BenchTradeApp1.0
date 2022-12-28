@@ -22,4 +22,15 @@ class InvalidProperty extends ValidationError {
   }
 }
 
-module.exports = { MissingPropertyError, InvalidProperty, ValidationError };
+class RegisterError extends ValidationError {
+  constructor() {
+    super(`Wrong email or password`);
+  }
+}
+
+module.exports = {
+  MissingPropertyError,
+  InvalidProperty,
+  ValidationError,
+  RegisterError,
+};
