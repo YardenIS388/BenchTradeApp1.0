@@ -2,6 +2,7 @@ import {useState, useContext} from 'react'
 import {SafeAreaView,Image} from 'react-native'
 import {useToast,Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text, AspectRatio } from 'native-base'
 import {UserContext} from "../context/authentication.context"
+import axios from 'axios';
 
 export default function LoginScreen () {
 
@@ -10,10 +11,13 @@ export default function LoginScreen () {
     const [message, setMessage] = useState ("")
     
     const loginErrorToast = useToast()
+    const loginUrl = "http://localhost:8082/auth/login"
 
-    const loginHandler = (e) => {
+
+    const loginHandler = async (e) => {
         if(loginData){
-            //TODO: this will be the part where I check if the password and email match the database
+           
+
             console.log({loginData})
             
             loginData.email ? login(loginData.email) : loginErrorToast.show({ description: "Seems there was an error with your login information" })
@@ -47,6 +51,7 @@ export default function LoginScreen () {
                     size="xs">
           Sign in to continue!
         </Heading>
+
 
         <VStack space={3} mt="5">
           <FormControl>
@@ -92,6 +97,8 @@ export default function LoginScreen () {
             </Link>
           </HStack>
         </VStack>
+
+
       </Box>
     </Center>
     </SafeAreaView>
