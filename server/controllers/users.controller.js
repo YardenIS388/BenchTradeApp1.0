@@ -2,6 +2,7 @@ const usersRepository = require("../repositories/utils/userRepo.object");
 const { isValidObjectId } = require("./../validators/mongoId.validator");
 const registerValidator = require("./../validators/user.validator");
 const bcrypt = require("bcrypt");
+const { bodyValidator } = require("./../validators/body.validator");
 const { PropertyExist, BodyNotSent } = require("../errors/BadRequest.errors");
 const {
   MissingPropertyError,
@@ -15,13 +16,13 @@ const {
 const { ServerUnableError } = require("../errors/internal.errors");
 
 exports.usersController = {
-  getUsers: async (req, res, next) => {
+  getUsers: async (req, res) => {
     const data = await usersRepository.find();
     if (!data) throw new EntityNotFound("Users");
     res.status(200).json(data);
   },
 
-  getUser: async (req, res, next) => {
+  getUser: async (req, res) => {
     if (!req.params) throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
@@ -31,8 +32,8 @@ exports.usersController = {
     res.status(200).json(data);
   },
 
-  createUser: async (req, res, next) => {
-    if (!req.body) throw new BodyNotSent();
+  createUser: async (req, res) => {
+    bodyValidator(req);
 
     const isValid = registerValidator(req.body);
     if (isValid[0]?.message) {
@@ -49,8 +50,8 @@ exports.usersController = {
     res.status(201).json({ data });
   },
 
-  updateUser: async (req, res, next) => {
-    if (!req.body) throw new BodyNotSent();
+  updateUser: async (req, res) => {
+    bodyValidator(req);
     if (!req.params.id) throw new MissingPropertyError("ID");
     if (!req.body.password) throw new MissingPropertyError("Password");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
@@ -65,7 +66,7 @@ exports.usersController = {
     res.status(201).json(data);
   },
 
-  removeUser: async (req, res, next) => {
+  removeUser: async (req, res) => {
     if (!req.params) throw new BodyNotSent();
     if (!req.params.id) throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
