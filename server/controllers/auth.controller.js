@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const usersRepository = require("../repositories/utils/userRepo.object");
 const bcrypt = require("bcrypt");
 const { isEmail } = require("./../validators/email.validator");
-const { BodyNotSent } = require("./../errors/BadRequest.errors");
+const { bodyValidator } = require("./../validators/body.validator");
 const {
   MissingPropertyError,
   RegisterError,
@@ -10,7 +10,7 @@ const {
 
 exports.authController = {
   login: async (req, res) => {
-    if (!req.body) throw new BodyNotSent();
+    bodyValidator(req);
     if (!req.body.email) throw new MissingPropertyError("email");
     if (!req.body.password) throw new MissingPropertyError("password");
 

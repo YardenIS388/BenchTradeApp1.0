@@ -40,7 +40,7 @@ exports.usersController = {
     }
 
     let { body: User } = req;
-    const existuser = await usersRepository.retrieveEmail(User.email);
+    const existuser = await usersRepository.retrieveByEmail(User.email);
     if (existuser) throw new PropertyExist("Email");
 
     const hashedPassword = await privateHashPassword(User.password);
