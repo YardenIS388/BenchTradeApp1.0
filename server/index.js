@@ -9,6 +9,7 @@ const path = require("path");
 const app = express();
 
 const { usersRouter } = require("./routes/users.router");
+const { authRouter } = require("./routes/auth.router");
 const { errorHandler } = require("./middleware/errorHandler.mw");
 const logPath = path.join(__dirname, "logs", "http.log");
 const port = process.env.PORT || 3000;
@@ -24,6 +25,7 @@ app.use(
 app.use(cors());
 
 // Routes
+app.use("/auth", authRouter);
 app.use("/users", usersRouter);
 
 // Error middleware

@@ -13,8 +13,7 @@ module.exports = class UsersRepository {
     return this.storage.retrieve(id);
   }
 
-  retrieveEmail(email) {
-    console.log(email);
+  retrieveByEmail(email) {
     return this.storage.retrieveEmail(email);
   }
 

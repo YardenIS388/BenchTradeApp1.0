@@ -1,5 +1,4 @@
-const UsersRepository = require("./../repositories/Users.repository");
-const usersRepository = new UsersRepository();
+const usersRepository = require("./utils/userRepo.object");
 const { isValidObjectId } = require("./../validators/mongoId.validator");
 const registerValidator = require("./../validators/user.validator");
 const bcrypt = require("bcrypt");
@@ -16,13 +15,13 @@ const {
 const { ServerUnableError } = require("../errors/internal.errors");
 
 exports.usersController = {
-  async getUsers(req, res, next) {
+  getUsers: async (req, res, next) => {
     const data = await usersRepository.find();
     if (!data) throw new EntityNotFound("Users");
     res.status(200).json(data);
   },
 
-  async getUser(req, res, next) {
+  getUser: async (req, res, next) => {
     if (!req.params) throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
@@ -32,7 +31,7 @@ exports.usersController = {
     res.status(200).json(data);
   },
 
-  async createUser(req, res, next) {
+  createUser: async (req, res, next) => {
     if (!req.body) throw new BodyNotSent();
 
     const isValid = registerValidator(req.body);
@@ -50,7 +49,7 @@ exports.usersController = {
     res.status(201).json({ data });
   },
 
-  async updateUser(req, res, next) {
+  updateUser: async (req, res, next) => {
     if (!req.body) throw new BodyNotSent();
     if (!req.params.id) throw new MissingPropertyError("ID");
     if (!req.body.password) throw new MissingPropertyError("Password");
@@ -66,7 +65,7 @@ exports.usersController = {
     res.status(201).json(data);
   },
 
-  async removeUser(req, res, next) {
+  removeUser: async (req, res, next) => {
     if (!req.params) throw new BodyNotSent();
     if (!req.params.id) throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
