@@ -6,6 +6,7 @@ const { bodyValidator } = require("./../validators/body.validator");
 const {
   MissingPropertyError,
   RegisterError,
+  InvalidProperty,
 } = require("./../errors/validation.errors");
 
 exports.authController = {
@@ -13,8 +14,8 @@ exports.authController = {
     bodyValidator(req);
     if (!req.body.email) throw new MissingPropertyError("email");
     if (!req.body.password) throw new MissingPropertyError("password");
-
     const { email, password } = req.body;
+    if (!isEmail(email)) throw new InvalidProperty("email");
     const existingUser = await usersRepository.retrieveByEmail(email);
     if (!existingUser) throw new RegisterError();
 
