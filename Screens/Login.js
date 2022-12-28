@@ -8,19 +8,20 @@ export default function LoginScreen () {
 
     const {login} = useContext(UserContext)
     const [loginData,    setLoginData]    = useState({})
-    const [message, setMessage] = useState ("")
+    
     
     const loginErrorToast = useToast()
     const loginUrl = "http://localhost:8082/auth/login"
 
 
-    const loginHandler = async (e) => {
+    const loginHandler = (e) => {
            
-        const loginRequest =  axios.post(loginUrl, {email: loginData.email, password: loginData.password})
-
+        const loginRequest = axios.post(loginUrl, {email: loginData.email, password: loginData.password})
+        const loginString = JSON.stringify(loginRequest)
             console.log({loginData})
             console.log(loginRequest)
-            loginRequest ? login({name: loginData.email , token: loginRequest}) : loginErrorToast.show({ description: "Seems there was an error with your login information" }) 
+
+            loginString ? login({name: loginData.email , token: loginString}) : loginErrorToast.show({ description: "Seems there was an error with your login information" }) 
     }
 
    

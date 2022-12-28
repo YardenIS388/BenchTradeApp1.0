@@ -8,10 +8,10 @@ export const UserProvider = ({children }) => {
 
     const [user, setUser] = useState({name:"" ,token:'', auth: false})
 
-    const login = (name) => {
+    const login = (currentUser) => {
         setUser((user) => ({
-            name: name,
-            token: token, 
+            name: currentUser.name,
+            token: currentUser.token, 
             auth: true
         })
       )
