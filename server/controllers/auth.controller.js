@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const usersRepository = require("./utils/userRepo.object");
+const usersRepository = require("../repositories/utils/userRepo.object");
 const bcrypt = require("bcrypt");
 const { isEmail } = require("./../validators/email.validator");
 const { BodyNotSent } = require("./../errors/BadRequest.errors");
@@ -17,6 +17,7 @@ exports.authController = {
     const { email, password } = req.body;
     const existingUser = await usersRepository.retrieveByEmail(email);
     if (!existingUser) throw new RegisterError();
+
     const isPasswordMatch = await bcrypt.compare(
       password,
       existingUser.password
