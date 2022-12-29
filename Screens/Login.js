@@ -1,8 +1,11 @@
 import {useState, useContext} from 'react'
-import {SafeAreaView,Image} from 'react-native'
-import {useToast,Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text, AspectRatio } from 'native-base'
+import {SafeAreaView,Image, View, Keyboard , TouchableWithoutFeedback } from 'react-native'
+import {useToast,Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text} from 'native-base'
 import {UserContext} from "../context/authentication.context"
 import axios from 'axios';
+
+
+
 
 export default function LoginScreen () {
 
@@ -27,6 +30,11 @@ export default function LoginScreen () {
    
     return(
     <SafeAreaView >
+    <TouchableWithoutFeedback onPress={ ()=> Keyboard.dismiss()}>
+    {/* if you want to wrap more than one chikd inside Touchabkeiwthoutfeedback it has to be a View */}
+    <View>
+
+    
     <Center w="100%" pt='50'>
     <Image source={require('../assets/images/loginImg.png')}/>
       <Box safeArea p="2" py="8" w="90%" maxW="290">
@@ -99,6 +107,9 @@ export default function LoginScreen () {
 
       </Box>
     </Center>
+
+    </View>
+    </TouchableWithoutFeedback>
     </SafeAreaView>
     )
 }

@@ -1,9 +1,22 @@
-import { View, Pressable } from "native-base";
+import { useState, useContext } from "react";
+import {
+  View,
+  Pressable,
+  Modal,
+  Button,
+  Avatar,
+  Text,
+  HStack,
+} from "native-base";
 import { Link } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
-
+import {UserContext} from "../context/authentication.context"
 
 const MenuComponent = () => {
+
+  const {logout} = useContext(UserContext)
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <View
       position="absolute"
@@ -13,10 +26,67 @@ const MenuComponent = () => {
       alignContent="center"
       justifyContent="space-between"
       w="100"
-      
     >
+      <Modal
+        isOpen={modalVisible}
+        onClose={() => setModalVisible(false)}
+      >
+        <Modal.Content
+          bg="light.100"
+          shadow="9"
+          pt="20"
+          style={{
+            marginLeft: 0,
+            marginTop: 0,
+            marginRight: "auto",
+            marginBottom: "auto",
+            height: "100%",
+            maxHeight:"100%",
+            rounded:"0"
+          }}
+        >
+          <Modal.Body>
+            <HStack
+              alignItems="center"
+              w="100%"
+              borderBottomWidth="1"
+              paddingBottom="5"
+              h="100%"
+            >
+              <Avatar
+                source={require("../assets/images/profile.png")}
+                marginRight="10"
+              ></Avatar>
+              <Text> User Name</Text>
+            </HStack>
+          </Modal.Body>
+          <Modal.Footer justifyContent="flex-start" p="0">
+            <Pressable
+              w="100%"
+              h="100%"
+              py="5"
+              pb="10"
+              px="5"
+              justifyContent="space-between"
+              onPress={()=> {
+                logout()
+              }}
+              _pressed={{
+                bg: "light.200",
+              }}
+            >
+              <View flexDirection="row">
+                <MaterialIcons name="logout" size={24} color="black" />
+                <Text fontSize="16"> Logout</Text>
+              </View>
+            </Pressable>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
       <Pressable
-        onPress={() => console.log("click")}
+        onPress={() => {
+          setModalVisible(!modalVisible);
+        }}
         _pressed={{
           shadow: "6",
           bg: "light.200",
@@ -27,24 +97,23 @@ const MenuComponent = () => {
         shadow="3"
         p="3"
         m="1"
-       
       >
         <MaterialIcons name="menu-open" size={24} color="black" />
       </Pressable>
-
-      <View alignItems="center"
-            bg="white"
-            borderRadius="full"
-            shadow="3"
-            p="3"
-            m="1">
-            
-          <Link to={{ screen: "NewListing" }}>
-             <MaterialIcons name="post-add" size={24} color="black" />
-          </Link>
+      <View
+        alignItems="center"
+        bg="white"
+        borderRadius="full"
+        shadow="3"
+        p="3"
+        m="1"
+      >
+        <Link to={{ screen: "NewListing" }}>
+          <MaterialIcons name="post-add" size={24} color="black" />
+        </Link>
       </View>
     </View>
-  )
-}
+  );
+};
 
 export default MenuComponent;

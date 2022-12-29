@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import {ImageBackground} from 'react-native'
 import {Image, Text,Heading , VStack,FormControl,Input,Button,Center,Select,CheckIcon, WarningOutlineIcon, NumberInputStepper, Pressable} from 'native-base'
+import {ImageBackground} from "react-native"
 import { AntDesign } from '@expo/vector-icons';
 
 export default function NewListingScreen({navigation}) {
@@ -53,17 +53,20 @@ export default function NewListingScreen({navigation}) {
       aspect: [4, 3],
       quality: 1,
     });
+
+    console.log("THE URI IS:"+result.assets[0].uri)  
     if (!result.canceled) {
-      console.lof(result)
+      console.log("everything is alright")
       setImage(result.assets[0].uri);
     }
   };
 
 
   return (
-  <Center mt='100'>
-    <Image source={{uri:"../assets/images/AddListingBackDrop.png"}} alt="bg"
-            w="100%" h="100%"></Image>
+  
+    <ImageBackground source={require("../assets/images/AddListingBackDrop.png")} alt="bg"
+            w="100%" h="100%">
+            <Center h="100%">
     <VStack width="90%" mx="3" maxW="300px">
       <Heading mb='50'>Let's Create a New Listing!</Heading>
       <FormControl isRequired isInvalid={'listing-title' in errors}>
@@ -119,18 +122,19 @@ export default function NewListingScreen({navigation}) {
 
       <FormControl maxW="300">
         <FormControl.Label>Upload Image</FormControl.Label>
-        <ImageBackground source={image} resizeMode="cover" >
+        <ImageBackground source={{uri:image}} resizeMode="cover" borderWidth="4">
           <Pressable borderWidth={1}
                      borderStyle='dashed'
                      borderRadius='4'
-                     backgroundColor='muted.100'
+                     backgroundColor={image ? "transperant" :'muted.100'}
                      borderColor='muted.300' 
                      height='150' 
                      justifyContent='center' 
                      alignItems='center'
                      onPress={pickImage}>
-               <AntDesign name="camerao" size={25} color="grey" />
+               <AntDesign name="camerao" size={25} color="grey" position="absolute"/>
                <Text>{errors.image}</Text>
+              { image ? <Image source={image} flex="1" h='100%' w="100%" alt=""></Image> : <Text>no image</Text>}
           </Pressable>
         </ImageBackground>
         </FormControl>
@@ -139,6 +143,8 @@ export default function NewListingScreen({navigation}) {
         Submit
       </Button>
     </VStack>
-  </Center>
-  );
+    </Center>
+    </ImageBackground>
+  
+  )
 }
