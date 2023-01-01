@@ -41,3 +41,24 @@ npm run dev
   - **fastest-validator** - validates entity information
   - **morgan** - http calls logger
   - **winston** - error logger
+  
+  
+  
+  
+## Front-end
+### How to run the server
+1. Go to root directory:
+```
+2. Install NPM packages:
+```
+ npx expo install
+```
+      
+4. Run the react-native app:
+```
+npm start / yarn
+```
+
+### Important message 
+This react-native project was created using the expo cli 
+
