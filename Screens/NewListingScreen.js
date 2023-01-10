@@ -20,6 +20,7 @@ import { CameraContext } from "../context/authentication.context";
 
 export default function NewListingScreen({ navigation }) {
   const { photo } = useContext(CameraContext);
+  const {clearPhoto} = useContext(CameraContext)
   const [image, setImage] = useState(null);
   const [imgCloudUrl, setImgCloudUrl] = useState(photo);
   const [formData, setFormData] = useState({});
@@ -29,7 +30,7 @@ export default function NewListingScreen({ navigation }) {
 
   useEffect(() => {
     setImgCloudUrl(photo);
-},[imgCloudUrl])
+},[])
 
 
 
@@ -39,6 +40,7 @@ export default function NewListingScreen({ navigation }) {
   }
 
   const validate = () => {
+
     // if (formData.name === undefined) {
     //   setErrors({ ...errors,
     //     name: 'Name is required'
@@ -58,6 +60,8 @@ export default function NewListingScreen({ navigation }) {
     //TODO: Complete form data validation and pass form Data to server
     validate() ? console.log("Submitted") : console.log("Validation Failed");
 
+
+    clearPhoto()
     navigation.navigate("MapScreen");
   };
 
@@ -175,7 +179,7 @@ export default function NewListingScreen({ navigation }) {
               borderStyle="dashed"
               borderRadius="4"
               borderColor="muted.300"
-              height="150"
+              height="250"
               justifyContent="center"
               alignItems="center"
               onPress={openCamera}
@@ -185,8 +189,7 @@ export default function NewListingScreen({ navigation }) {
                 name="camerao"
                 size={25}
                 color="grey"
-                position="absolute"
-                alignSelf="center"
+                style={{position:"absolute"}}
               />
               :
               null
@@ -194,6 +197,7 @@ export default function NewListingScreen({ navigation }) {
               <View borderRadius="4" w="100%" h="100%">
               {imgCloudUrl.photo ?
                 <ImageBackground
+                  key={imgCloudUrl}
                   resizeMode="cover"
                   borderRadius="4"
                   style={{flex:1}}
@@ -207,7 +211,7 @@ export default function NewListingScreen({ navigation }) {
             </Pressable>
           </FormControl>
 
-          <Button onPress={onSubmit} height="50" mt="20" colorScheme="green">
+          <Button onPress={onSubmit} height="50" mt="5" colorScheme="green">
             Submit
           </Button>
         </VStack>
