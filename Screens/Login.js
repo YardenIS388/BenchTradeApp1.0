@@ -1,6 +1,7 @@
 import {useState, useContext} from 'react'
 import {SafeAreaView,Image, View, Keyboard , TouchableWithoutFeedback } from 'react-native'
-import {useToast,Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text} from 'native-base'
+import {useToast,Center, Box, Heading, VStack, FormControl, Input, HStack, Button, Text} from 'native-base'
+import { Link } from '@react-navigation/native';
 import {UserContext} from "../context/authentication.context"
 import axios from 'axios';
 
@@ -21,9 +22,7 @@ export default function LoginScreen () {
            
         const loginRequest = axios.post(loginUrl, {email: loginData.email, password: loginData.password})
         const loginString = JSON.stringify(loginRequest)
-            console.log({loginData})
-            console.log(loginRequest)
-
+        
             loginString ? login({name: loginData.email , token: loginString}) : loginErrorToast.show({ description: "Seems there was an error with your login information" }) 
     }
 
@@ -76,11 +75,7 @@ export default function LoginScreen () {
                 height="50" 
                 placeholder="Your password" 
                 onChangeText= {value => setLoginData({ ...loginData, password: value })} />
-            <Link _text={{
-            fontSize: "xs",
-            fontWeight: "500",
-            color: "emerald.500"
-          }} alignSelf="flex-end" mt="1">
+            <Link to={{screen: ""}}>
               Forget Password?
             </Link>
           </FormControl>
@@ -93,12 +88,7 @@ export default function LoginScreen () {
           }}>
               I'm a new user.{" "}
             </Text>
-            <Link _text={{
-                color: "emerald.500",
-                fontWeight: "medium",
-                fontSize: "sm"
-                }} 
-                href="#">
+            <Link to={{ screen: "RegisterScreen" }}>
                 Sign Up
             </Link>
           </HStack>
