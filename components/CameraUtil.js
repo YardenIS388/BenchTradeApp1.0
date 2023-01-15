@@ -124,6 +124,7 @@ const CameraPreview = ({ photo, handleDiscard, makePreviewUnvisible }) => {
     setIsLoading(false)
     makePreviewUnvisible()
     
+    
   }
 
   return isLoading ? (

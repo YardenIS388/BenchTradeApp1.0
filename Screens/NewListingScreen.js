@@ -12,6 +12,7 @@ import {
   Select,
   CheckIcon,
   Pressable,
+  useToast
 } from "native-base";
 import { ImageBackground } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -19,18 +20,17 @@ import CameraUtil from "../components/CameraUtil";
 import { CameraContext } from "../context/authentication.context";
 
 export default function NewListingScreen({ navigation }) {
-  const { photo } = useContext(CameraContext);
-  const {clearPhoto} = useContext(CameraContext)
-  const [image, setImage] = useState(null);
-  const [imgCloudUrl, setImgCloudUrl] = useState(photo);
-  const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [camera, setCamera] = useState(false);
-  const [cameraImage, setCameraImage] = useState(photo);
 
-  useEffect(() => {
-    setImgCloudUrl(photo);
-},[])
+  const { photo } = useContext(CameraContext)
+  const {clearPhoto} = useContext(CameraContext)
+  const [image, setImage] = useState(null)
+  const [formData, setFormData] = useState({})
+  const [errors, setErrors] = useState({})
+  const [camera, setCamera] = useState(false)
+  const newListingToast = useToast()
+
+
+
 
 
 
@@ -58,11 +58,22 @@ export default function NewListingScreen({ navigation }) {
 
   const onSubmit = () => {
     //TODO: Complete form data validation and pass form Data to server
-    validate() ? console.log("Submitted") : console.log("Validation Failed");
+    validate() ? console.log("Submitted") : newListingToast.show({
+      title: "Sorry, Something Went Wrong",
+      variant: "subtle",
+      description: "Please make sure all fields are filled out correctly"
+    });
 
-
+    console.log(formData)
+    console.log(photo.photo)
     clearPhoto()
     navigation.navigate("MapScreen");
+    newListingToast.show({
+      title: "Sucssess",
+      variant: "subtle",
+      placement:"top",
+      description: "Your new listing in now visible for everyone to see"
+    })
   };
 
   const openCamera = () => {
@@ -88,9 +99,11 @@ export default function NewListingScreen({ navigation }) {
       console.log("everything is alright");
       setImage(result.assets[0].uri);
     }
-  };
+  }
 
-  console.log(imgCloudUrl);
+
+
+
   return (
     <ImageBackground
       source={require("../assets/images/AddListingBackDrop.png")}
@@ -184,7 +197,7 @@ export default function NewListingScreen({ navigation }) {
               alignItems="center"
               onPress={openCamera}
             >
-            { !imgCloudUrl.photo ?
+            { !photo.photo ?
               <AntDesign
                 name="camerao"
                 size={25}
@@ -195,13 +208,13 @@ export default function NewListingScreen({ navigation }) {
               null
             }
               <View borderRadius="4" w="100%" h="100%">
-              {imgCloudUrl.photo ?
+              {photo.photo ?
                 <ImageBackground
-                  key={imgCloudUrl}
+                  key={photo.photo}
                   resizeMode="cover"
                   borderRadius="4"
                   style={{flex:1}}
-                  source={{uri:imgCloudUrl.photo}}
+                  source={{uri:photo.photo}}
                   alt="watermelon"
                 ></ImageBackground>
                 :

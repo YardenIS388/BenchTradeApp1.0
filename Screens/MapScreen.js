@@ -1,22 +1,31 @@
-import { StyleSheet, Fab , Icon,Pressable } from "react-native"
+import { StyleSheet} from "react-native"
 import {View} from "native-base"
 import {useState , useEffect} from 'react'
 import MapView from 'react-native-maps'
 import { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 import markerList from '../fakeLocations.json'
-import markerListSorted from '../sortedLocations.json'
 import LocationCardsMenu from "../components/LocationCardsMenu";
 import MenuComponent from "../components/Menu"
+import axios from "axios"
 
+const findAllListings = "http://localhost:8082/listings/list"
 
 export default function MapScreen (){
 
-
   const [selectedPin, setSelectedPin] = useState({});
   const [markers, setMarkers] = useState(markerList ? markerList : []); // initial markers state 
+  const [listings, setListings] = useState([])
   const [location, setLocation] = useState({});
-  const [sortType, setSortType] = useState("location")
+  
+  const getListings = async ()=>{
+        const listingsFromDB = await axios.get(findAllListings).then(
+          res => {
+              console.log(res.data)
+          }
+        )
+        
+  }
 
   useEffect(() => {
     (async () => {
@@ -35,6 +44,7 @@ export default function MapScreen (){
     })();
   
    setMarkers(markerList)
+   getListings()
 
   }, []);
 
