@@ -54,7 +54,6 @@ exports.listingsController = {
   updateListing: async (req, res) => {
     bodyValidator(req);
     if (!req.params.id) throw new MissingPropertyError("ID");
-    if (!req.body.password) throw new MissingPropertyError("Password");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     let {
