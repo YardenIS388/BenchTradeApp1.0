@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext,useState } from "react";
 
 
 
@@ -32,3 +32,28 @@ export const UserProvider = ({children }) => {
     )
 }
 
+export const CameraContext = createContext({photo: null})
+export const CameraProvider = ({children }) => {
+
+  const [photo, setPhoto] = useState({})
+  console.log(photo)
+  const setNewPhoto = (currentPhoto) => {
+      console.log("|callinf setNewPhoto")
+      setPhoto((photo) => ({
+          photo: currentPhoto
+      })
+    )
+  }
+
+  const clearPhoto = () => {
+      setPhoto((photo) => ({
+        photo: null
+      }));
+    };
+
+  return (
+      <CameraContext.Provider value = {{photo, setNewPhoto, clearPhoto}}>
+          {children}
+      </CameraContext.Provider>
+  )
+}

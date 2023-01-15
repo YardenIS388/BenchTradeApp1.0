@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MapScreen from "../Screens/MapScreen.js";
 import NewListing from "../Screens/NewListingScreen";
 import {UserContext} from "../context/authentication.context";
+import RegisterScreen from '../Screens/RegisterScreen.js';
 
 export default function AuthStack() {
 
@@ -41,6 +42,13 @@ export default function AuthStack() {
       <Stack.Screen
         name="Login"
         component={Login}
+        options={{
+          headerShown: false
+        }}
+      />
+       <Stack.Screen
+        name="RegisterScreen"
+        component={RegisterScreen}
         options={{
           headerShown: false
         }}
