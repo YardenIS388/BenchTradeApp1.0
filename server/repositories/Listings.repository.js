@@ -13,8 +13,8 @@ module.exports = class ListingsRepository {
     return this.storage.retrieve(id);
   }
 
-  retrieveByLoction(lat,lon) {
-    return this.storage.retrieveLocation(lat,lon);
+  retrieveByLoction(lat, lon) {
+    return this.storage.retriveByAttributes(lat, "lat", lon, "lon");
   }
 
   create(Listing) {

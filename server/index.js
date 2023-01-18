@@ -11,6 +11,7 @@ const app = express();
 const { usersRouter } = require("./routes/users.router");
 const { authRouter } = require("./routes/auth.router");
 const { errorHandler } = require("./middleware/errorHandler.mw");
+const { listingsRouter } = require("./routes/listings.router");
 const logPath = path.join(__dirname, "logs", "http.log");
 const port = process.env.PORT || 3000;
 
@@ -45,6 +46,7 @@ app.use(cors({
 // Routes
 app.use("/auth", authRouter);
 app.use("/users", usersRouter);
+app.use("/listings", listingsRouter);
 
 // Error middleware
 app.use(errorHandler);
