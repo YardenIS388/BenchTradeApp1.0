@@ -32,6 +32,13 @@ module.exports = class MongoStorage {
     return this.Model.findOne({ email: email });
   }
 
+  retriveByAttributes(attribute1, attributeName1, attribute2, attributeName2) {
+    const obj = {};
+    obj[attributeName1] = attribute1;
+    obj[attributeName2] = attribute2;
+    return this.Model.find(obj);
+  }
+
   create(data) {
     const entity = new this.Model(data);
     return entity.save();

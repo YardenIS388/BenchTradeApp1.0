@@ -23,7 +23,8 @@ exports.usersController = {
   },
 
   getUser: async (req, res) => {
-    if (!req.params) throw new MissingPropertyError("ID");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     const { id } = req.params;
@@ -52,15 +53,18 @@ exports.usersController = {
 
   updateUser: async (req, res) => {
     bodyValidator(req);
-    if (!req.params.id) throw new MissingPropertyError("ID");
-    if (!req.body.password) throw new MissingPropertyError("Password");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
-
+    const user = await usersRepository.retrieve(req.params.id);
     let {
       body: User,
       params: { id },
     } = req;
-    User = { ...User, password: await privateHashPassword(User.password) };
+    let password = User.password
+      ? await privateHashPassword(User.password)
+      : user.password;
+    User = { ...User, password: password };
     const data = await usersRepository.update(id, User);
     if (!data) throw new ServerUnableError("update");
     res.status(201).json(data);
@@ -68,7 +72,8 @@ exports.usersController = {
 
   removeUser: async (req, res) => {
     if (!req.params) throw new BodyNotSent();
-    if (!req.params.id) throw new MissingPropertyError("ID");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     const { id } = req.params;
