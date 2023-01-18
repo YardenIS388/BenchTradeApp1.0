@@ -167,8 +167,8 @@ const Card = (props) => {
             py="1.5"
           >
             <HStack justifyContent="center" alignItems="center">
-              <FontAwesome name="location-arrow" size={14} color="black" />
-              <Text> 0.6 km </Text>
+              <FontAwesome name="location-arrow" size={14} color="light.100" />
+              <Text color="light.100"> 0.6 km </Text>
             </HStack>
           </Center>
         </Box>

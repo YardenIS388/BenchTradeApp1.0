@@ -22,7 +22,25 @@ app.use(
     stream: fs.createWriteStream(logPath, { flags: "a" }),
   })
 );
-app.use(cors());
+
+
+const allowedOrigins = ["http://localhost:19000", "http://30.30.2.218:8081:19000"]
+
+app.use(cors({
+
+    origin: function(origin, callback){
+      // allow requests with no origin
+      // (like mobile apps or curl requests)
+      if(!origin) return callback(null, true);
+      if(allowedOrigins.indexOf(origin) === -1){
+        var msg = 'The CORS policy for this site does not ' +
+                  'allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  }));
 
 // Routes
 app.use("/auth", authRouter);

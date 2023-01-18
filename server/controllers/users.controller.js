@@ -33,8 +33,8 @@ exports.usersController = {
   },
 
   createUser: async (req, res) => {
+    console.log("creatwUser-server")
     bodyValidator(req);
-
     const isValid = registerValidator(req.body);
     if (isValid[0]?.message) {
       throw new ValidationError(isValid[0].message);
@@ -46,6 +46,7 @@ exports.usersController = {
 
     const hashedPassword = await privateHashPassword(User.password);
     User = { ...User, password: hashedPassword };
+    console.log(User)
     const data = await usersRepository.create(User);
     res.status(201).json({ data });
   },
