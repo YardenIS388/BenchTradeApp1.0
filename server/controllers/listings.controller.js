@@ -46,10 +46,12 @@ exports.listingsController = {
     bodyValidator(req);
     if (!req.body.lat) throw new MissingPropertyError("latitude");
     if (!req.body.lon) throw new MissingPropertyError("longtitude");
-    if (!req.body.tags) throw new MissingPropertyError("tags");
+    if (!req.body.tags || req.body.tags.length === 0)
+      throw new MissingPropertyError("tags");
     if (!req.body.number_of_items)
       throw new MissingPropertyError("number of items");
-    if (!req.body.images) throw new MissingPropertyError("images");
+    if (!req.body.images || req.body.images.length === 0)
+      throw new MissingPropertyError("images");
 
     let { body: Listing } = req;
     const data = await listingsRepository.create(Listing);
@@ -58,7 +60,8 @@ exports.listingsController = {
 
   updateListing: async (req, res) => {
     bodyValidator(req);
-    if (!req.params.id) throw new MissingPropertyError("ID");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     let {
@@ -72,7 +75,6 @@ exports.listingsController = {
   },
 
   removeListing: async (req, res) => {
-    bodyValidator(req);
     if (!req.params.id || req.params.id === ":id")
       throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");

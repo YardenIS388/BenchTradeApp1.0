@@ -23,7 +23,8 @@ exports.usersController = {
   },
 
   getUser: async (req, res) => {
-    if (!req.params) throw new MissingPropertyError("ID");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     const { id } = req.params;
@@ -52,7 +53,8 @@ exports.usersController = {
 
   updateUser: async (req, res) => {
     bodyValidator(req);
-    if (!req.params.id) throw new MissingPropertyError("ID");
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!req.body.password) throw new MissingPropertyError("Password");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
