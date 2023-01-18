@@ -1,26 +1,39 @@
-import {useState} from 'react'
-import {SafeAreaView, TextInput,StyleSheet,Image, Pressable,View} from 'react-native'
-import {Center, Box, Heading, VStack, FormControl, Input, Link, HStack, Button, Text, AspectRatio } from 'native-base'
+import {useState, useContext} from 'react'
+import {SafeAreaView,Image, View, Keyboard , TouchableWithoutFeedback } from 'react-native'
+import {useToast,Center, Box, Heading, VStack, FormControl, Input, HStack, Button, Text} from 'native-base'
+import { Link } from '@react-navigation/native';
+import {UserContext} from "../context/authentication.context"
+import axios from 'axios';
 
 
-export default function LoginScreen ({navigation}) {
- 
+
+
+export default function LoginScreen () {
+
+    const {login} = useContext(UserContext)
     const [loginData,    setLoginData]    = useState({})
+    
+    
+    const loginErrorToast = useToast()
+    const loginUrl = "http://localhost:8082/auth/login"
 
 
     const loginHandler = (e) => {
-        if(loginData){
-            //TODO: this will be the part where I check if the password and email match the database
-            console.log({loginData})
-            navigation.navigate('MapScreen')
-        }
-        else{
-            setLoginData(null)
-        }
+           
+        const loginRequest = axios.post(loginUrl, {email: loginData.email, password: loginData.password})
+        const loginString = JSON.stringify(loginRequest)
+        
+            loginString ? login({name: loginData.email , token: loginString}) : loginErrorToast.show({ description: "Seems there was an error with your login information" }) 
     }
-    console.log({...loginData})
+
+   
     return(
     <SafeAreaView >
+    <TouchableWithoutFeedback onPress={ ()=> Keyboard.dismiss()}>
+    {/* if you want to wrap more than one chikd inside Touchabkeiwthoutfeedback it has to be a View */}
+    <View>
+
+    
     <Center w="100%" pt='50'>
     <Image source={require('../assets/images/loginImg.png')}/>
       <Box safeArea p="2" py="8" w="90%" maxW="290">
@@ -44,6 +57,7 @@ export default function LoginScreen ({navigation}) {
           Sign in to continue!
         </Heading>
 
+
         <VStack space={3} mt="5">
           <FormControl>
             <FormControl.Label>Email ID</FormControl.Label>
@@ -61,11 +75,7 @@ export default function LoginScreen ({navigation}) {
                 height="50" 
                 placeholder="Your password" 
                 onChangeText= {value => setLoginData({ ...loginData, password: value })} />
-            <Link _text={{
-            fontSize: "xs",
-            fontWeight: "500",
-            color: "emerald.500"
-          }} alignSelf="flex-end" mt="1">
+            <Link to={{screen: ""}}>
               Forget Password?
             </Link>
           </FormControl>
@@ -78,18 +88,18 @@ export default function LoginScreen ({navigation}) {
           }}>
               I'm a new user.{" "}
             </Text>
-            <Link _text={{
-                color: "emerald.500",
-                fontWeight: "medium",
-                fontSize: "sm"
-                }} 
-                href="#">
+            <Link to={{ screen: "RegisterScreen" }}>
                 Sign Up
             </Link>
           </HStack>
         </VStack>
+
+
       </Box>
     </Center>
+
+    </View>
+    </TouchableWithoutFeedback>
     </SafeAreaView>
     )
 }

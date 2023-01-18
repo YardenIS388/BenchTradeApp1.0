@@ -1,28 +1,33 @@
-import { StyleSheet , View , Text } from 'react-native';
-import MapScreen from './Screens/MapScreen';
-import Login from './Screens/Login';
-import {useState} from 'react'
-import NewListingScreen from './Screens/NewListingScreen';
-import { NavigationContainer } from '@react-navigation/native'
-import HomeStack from './routes/homeStack'
-import Stack from './routes/homeStack';
-import { NativeBaseProvider, Box } from "native-base";
+import {
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
+  View,
+} from "react-native";
+import { NativeBaseProvider } from "native-base";
+import { NavigationContainer } from "@react-navigation/native";
+import AuthStack from "./routes/authStack";
+import { UserProvider, CameraProvider } from "./context/authentication.context";
 
 export default function App() {
   return (
-    <NativeBaseProvider >
-        <NavigationContainer >
-            <Stack/>
-        </NavigationContainer>
-    </NativeBaseProvider>
+    <UserProvider>
+      <CameraProvider>
+        <NativeBaseProvider>
+          <NavigationContainer>
+            <AuthStack></AuthStack>
+          </NavigationContainer>
+        </NativeBaseProvider>
+      </CameraProvider>
+    </UserProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
