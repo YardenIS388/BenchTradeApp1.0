@@ -1,7 +1,5 @@
 const listingsRepository = require("../repositories/utils/listingRepo.object");
 const { isValidObjectId } = require("./../validators/mongoId.validator");
-const registerValidator = require("./../validators/listing.validator");
-const bcrypt = require("bcrypt");
 const { bodyValidator } = require("./../validators/body.validator");
 const { PropertyExist, BodyNotSent } = require("../errors/BadRequest.errors");
 const {
@@ -17,7 +15,6 @@ const {
 const { ServerUnableError } = require("../errors/internal.errors");
 
 exports.listingsController = {
-    
   getListings: async (req, res) => {
     const data = await listingsRepository.find();
     if (!data) throw new EntityNotFound("Listings");
@@ -25,7 +22,8 @@ exports.listingsController = {
   },
 
   getListing: async (req, res) => {
-    if (!req.params) throw new MissingPropertyError("ID");
+    if (!req.params || !req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     const { id } = req.params;
@@ -34,21 +32,28 @@ exports.listingsController = {
     res.status(200).json(data);
   },
 
+  getListingByLocation: async (req, res) => {
+    if (!req.query.lat) throw new MissingPropertyError("latitude");
+    if (!req.query.lon) throw new MissingPropertyError("longtitude");
+    const { lat, lon } = req.query;
+    console.log(lat, lon);
+    const data = await listingsRepository.retrieveByLoction(lat, lon);
+    if (!data) throw new EntityNotFound("listing");
+    res.status(200).json(data);
+  },
+
   createListing: async (req, res) => {
     bodyValidator(req);
-
-    const isValid = registerValidator(req.body);
-    if (isValid[0]?.message) {
-      throw new ValidationError(isValid[0].message);
-    }
+    if (!req.body.lat) throw new MissingPropertyError("latitude");
+    if (!req.body.lon) throw new MissingPropertyError("longtitude");
+    if (!req.body.tags) throw new MissingPropertyError("tags");
+    if (!req.body.number_of_items)
+      throw new MissingPropertyError("number of items");
+    if (!req.body.images) throw new MissingPropertyError("images");
 
     let { body: Listing } = req;
-//    const existlisting = await listingsRepository.retrieveByLoction(Listing.lat,Listing.lon);
-//    if (existlisting) throw new PropertyExist("Location");
-
-    Listing = { ...Listing};
     const data = await listingsRepository.create(Listing);
-    res.status(201).json({ data });
+    res.status(201).json(data);
   },
 
   updateListing: async (req, res) => {
@@ -60,15 +65,16 @@ exports.listingsController = {
       body: Listing,
       params: { id },
     } = req;
-    Listing = { ...Listing};
+    Listing = { ...Listing };
     const data = await listingsRepository.update(id, Listing);
     if (!data) throw new ServerUnableError("update");
     res.status(201).json(data);
   },
 
   removeListing: async (req, res) => {
-    if (!req.params) throw new BodyNotSent();
-    if (!req.params.id) throw new MissingPropertyError("ID");
+    bodyValidator(req);
+    if (!req.params.id || req.params.id === ":id")
+      throw new MissingPropertyError("ID");
     if (!isValidObjectId(req.params.id)) throw new InvalidProperty("ID");
 
     const { id } = req.params;
