@@ -12,33 +12,36 @@ import {
   Select,
   CheckIcon,
   Pressable,
-  useToast
+  useToast,
+  Spinner,
+  HStack
 } from "native-base";
 import { ImageBackground } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import CameraUtil from "../components/CameraUtil";
-import { CameraContext, LocationContext } from "../context/authentication.context";
-import axios from "axios"
+import {
+  CameraContext,
+  LocationContext,
+} from "../context/authentication.context";
+import axios from "axios";
 export default function NewListingScreen({ navigation }) {
+  const { location } = useContext(LocationContext);
+  const { photo } = useContext(CameraContext);
+  const { clearPhoto } = useContext(CameraContext);
+  const [image, setImage] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [camera, setCamera] = useState(false);
+  const newListingToast = useToast();
+  const createListingrUrl = "https://trade-bench-server.onrender.com/listings";
+  const [loading, setLoading] = useState(false);
 
-  const {location} = useContext(LocationContext)
-  const { photo } = useContext(CameraContext)
-  const {clearPhoto} = useContext(CameraContext)
-  const [image, setImage] = useState(null)
-  const [formData, setFormData] = useState({})
-  const [errors, setErrors] = useState({})
-  const [camera, setCamera] = useState(false)
-  const newListingToast = useToast()
-  const createListingrUrl = "https://trade-bench-server.onrender.com/listings"
-
-  
   const numbers = [];
   for (let i = 0; i < 100; i++) {
     numbers.push(i);
   }
 
   const validate = () => {
-
     //  if(!photo.photo){
     //   newListingToast.show({
     //     title: "You have to take a picture of your listing so others can see it",
@@ -63,34 +66,18 @@ export default function NewListingScreen({ navigation }) {
     //   })
     //   return false;
     // }
-    return true
+    return true;
   };
 
   const onSubmit = () => {
     //TODO: Complete form data validation and pass form Data to server
-   if ( validate()) {
-        console.log(formData)
-        console.log(photo.photo)
-        createListingRequest(formData).then( () => {
-              clearPhoto()
-         
-          newListingToast.show({
-          title: "Sucssess",
-          variant: "subtle",
-          placement:"top",
-          description: "Your new listing in now visible for everyone to see"
-      })
-          navigation.navigate("MapScreen");
-      }
-    ).catch((error)=> {
-      console.log("error in then" + error)
-    })
-     
-   } 
-  }
+    if (validate()) {
+      createListingRequest(formData);
+    }
+  };
 
   const openCamera = () => {
-    console.log("click");
+    //console.log("click");
     setCamera(true);
   };
 
@@ -109,46 +96,62 @@ export default function NewListingScreen({ navigation }) {
 
     console.log("THE URI IS:" + result.assets[0].uri);
     if (!result.canceled) {
-      console.log("everything is alright");
+      //console.log("everything is alright");
       setImage(result.assets[0].uri);
     }
-  }
-
-
-
+  };
 
   const createListingRequest = async (formData) => {
-    // console.log("1. create user")
-
-    console.log(" priniting coordinate"+location.longitude,location.latitude)
-    try {
-        const listingRequest = await axios({
-          method: 'POST',
-          url: createListingrUrl,
-          withCredentials: true,
-          data:   {
-            location: {
-                type: "Point",
-                coordinates: [
-                  location.location.coords.longitude,
-                  location.location.coords.latitude
-                ]
-            },
-            number_of_items: formData.amount,
-            tags: [
-                formData.category
-            ],
-            images: [
-                photo.photo
-            ]
+    setLoading(true)
+    const listingRequest = await axios({
+      method: "POST",
+      url: createListingrUrl,
+      withCredentials: true,
+      data: {
+        location: {
+          type: "Point",
+          coordinates: [
+            location.location.coords.longitude,
+            location.location.coords.latitude,
+          ],
         },
-        })
-        console.log({listingRequest})
-      } catch(error){
-          console.log("error in function" + error)
-          return
-      }
-  }
+        number_of_items: formData.amount,
+        tags: [formData.category],
+        images: [photo.photo],
+      },
+    })
+      .then((response) => {
+        if (response.status == 201) {
+          clearPhoto();
+          setLoading(false)
+          navigation.navigate("MapScreen")
+          newListingToast.show({
+            title: "Sucssess",
+            variant: "subtle",
+            placement: "top",
+            description: "Your new listing in now visible for everyone to see",
+          })
+        }
+        else {
+          setLoading(false)
+          newListingToast.show({
+            title: "Somehing Went Wrong",
+            variant: "subtle",
+            placement: "top",
+            description: "Sorry, ww could not process that request",
+          })
+        }
+      })
+      .catch((error) => {
+        console.log("error in then" + error);
+        newListingToast.show({
+          title: "Failure",
+          variant: "subtle",
+          placement: "top",
+          description: "Sorry, something went wrong",
+        });
+      });
+  };
 
   return (
     <ImageBackground
@@ -243,35 +246,38 @@ export default function NewListingScreen({ navigation }) {
               alignItems="center"
               onPress={openCamera}
             >
-            { !photo.photo ?
-              <AntDesign
-                name="camerao"
-                size={25}
-                color="grey"
-                style={{position:"absolute"}}
-              />
-              :
-              null
-            }
+              {!photo.photo ? (
+                <AntDesign
+                  name="camerao"
+                  size={25}
+                  color="grey"
+                  style={{ position: "absolute" }}
+                />
+              ) : null}
               <View borderRadius="4" w="100%" h="100%">
-              {photo.photo ?
-                <ImageBackground
-                  key={photo.photo}
-                  resizeMode="cover"
-                  borderRadius="4"
-                  style={{flex:1}}
-                  source={{uri:photo.photo}}
-                  alt="watermelon"
-                ></ImageBackground>
-                :
-                <View w="0" h="0"></View>
-              }
+                {photo.photo ? (
+                  <ImageBackground
+                    key={photo.photo}
+                    resizeMode="cover"
+                    borderRadius="4"
+                    style={{ flex: 1 }}
+                    source={{ uri: photo.photo }}
+                    alt="watermelon"
+                  ></ImageBackground>
+                ) : (
+                  <View w="0" h="0"></View>
+                )}
               </View>
             </Pressable>
           </FormControl>
 
-          <Button onPress={onSubmit} height="50" mt="5" colorScheme="green">
-            Submit
+          <Button onPress={onSubmit} h="50" mt="5" colorScheme="emerald">
+          {loading ?  
+                  <HStack justifyContent="space-around" width="100"> 
+                      <Spinner accessibilityLabel="Loading posts" color="white"/>
+                      <Text color="white" fontSize="sm">Loading </Text> 
+                  </HStack>: 
+                  "Submit"}
           </Button>
         </VStack>
       </Center>

@@ -79,7 +79,7 @@ export default function RegisterScreen({navigation}) {
       if (registerRequest.data) {
         // convert response to string and pass it to login function
         const registerString = JSON.stringify(registerRequest.data);
-        console.log({registerDataL:registerData.email})
+        //console.log({registerDataL:registerData.email})
         //TODO: make sure this authenticates the stack and moves user to home screen 
         loginErrorToast.show({description:"Great! user created sucssefully "})
         //navigation.navigate('Login')
@@ -116,9 +116,9 @@ export default function RegisterScreen({navigation}) {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         {/* if you want to wrap more than one chikd inside Touchabkeiwthoutfeedback it has to be a View */}
         <View>
-          <Center w="100%" pt="5">
-            <Image source={require("../assets/images/loginImg.png")} />
-            <Box safeArea p="2" py="1" w="90%" maxW="290">
+          <Center w="100%" alignItems="center">
+            <Box safeArea w="80%" h="100%">
+              <Image style={{width: '100%' ,resizeMode:'contain', marginBottom:100}} source={require("../assets/images/TradeBenchLogin.png")} />
               <Heading
                 size="lg"
                 fontWeight="600"
@@ -196,7 +196,7 @@ export default function RegisterScreen({navigation}) {
                   />
                 </FormControl>
 
-                <Button mt="2" colorScheme="emerald" onPress={registerHandler}>
+                <Button mt="2" colorScheme="emerald" h="50" onPress={registerHandler}>
                   Sign up
                 </Button>
               </ScrollView>

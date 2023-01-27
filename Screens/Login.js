@@ -50,7 +50,7 @@ export default function LoginScreen() {
       if (loginRequest.status === 200 && loginRequest.data) {
         // convert response to string and pass it to login function
         const loginString = JSON.stringify(loginRequest.data);
-        console.log({loginString:loginString})
+        //console.log({loginString:loginString})
         login({ name: loginData.email, token: loginString });
       } else {
         loginErrorToast.show({
@@ -61,9 +61,15 @@ export default function LoginScreen() {
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        //console.log(error.response.data);
+        //console.log("is it this one"+ error.response.status);
+        //console.log(error.response.headers);
+        //console.log(error.response.message)
+        setLoading(false)
+        loginErrorToast.show({
+          description: error.response.message ? error.response.data.message : "Uh oh! there was an error with your login information",
+        });
+
       } else if (error.request) {
         // The request was made but no response was received
         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -82,9 +88,9 @@ export default function LoginScreen() {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         {/* if you want to wrap more than one chikd inside Touchabkeiwthoutfeedback it has to be a View */}
         <View>
-          <Center w="100%" pt="50">
-            <Image source={require("../assets/images/loginImg.png")} />
-            <Box safeArea p="2" py="8" w="90%" maxW="290">
+          <Center w="100%" alignItems="center">
+            <Box safeArea w="80%" h="100%">
+              <Image style={{width: '100%' ,resizeMode:'contain', marginBottom:100}} source={require("../assets/images/TradeBenchLogin.png")} />
               <Heading
                 size="lg"
                 fontWeight="600"
@@ -138,7 +144,7 @@ export default function LoginScreen() {
                     Forget Password?
                   </Link>
                 </FormControl>
-                <Button mt="2" colorScheme="emerald" onPress={loginHandler}>
+                <Button mt="2" h="50" colorScheme="emerald" onPress={loginHandler}>
                   
                   {loading ?  
                   <HStack justifyContent="space-around" width="100"> 

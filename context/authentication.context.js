@@ -36,9 +36,9 @@ export const CameraContext = createContext({photo: null})
 export const CameraProvider = ({children }) => {
 
   const [photo, setPhoto] = useState({})
-  console.log(photo)
+  // console.log(photo)
   const setNewPhoto = (currentPhoto) => {
-      console.log("|callinf setNewPhoto")
+     // console.log("|callinf setNewPhoto")
       setPhoto((photo) => ({
           photo: currentPhoto
       })
@@ -63,9 +63,8 @@ export const LocationContext = createContext({location: null})
 export const LocationProvider = ({children }) => {
 
   const [location, setLocation] = useState({})
-  console.log(location)
   const setNewLocation = (currentLocation) => {
-      console.log("|calling setNewLocation")
+      //console.log("|calling setNewLocation")
       setLocation((location) => ({
           location: currentLocation
       })

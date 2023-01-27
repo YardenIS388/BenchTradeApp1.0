@@ -14,7 +14,7 @@ export default function AuthStack() {
   
   //TODO: load the actual variable to indicate sucssefull login 
   const loggedIn = true
-  console.log(user)
+  //console.log(user)
     
   return (
     user.auth ? 
