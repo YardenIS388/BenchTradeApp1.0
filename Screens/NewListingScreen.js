@@ -17,10 +17,11 @@ import {
 import { ImageBackground } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import CameraUtil from "../components/CameraUtil";
-import { CameraContext } from "../context/authentication.context";
-
+import { CameraContext, LocationContext } from "../context/authentication.context";
+import axios from "axios"
 export default function NewListingScreen({ navigation }) {
 
+  const {location} = useContext(LocationContext)
   const { photo } = useContext(CameraContext)
   const {clearPhoto} = useContext(CameraContext)
   const [image, setImage] = useState(null)
@@ -28,12 +29,9 @@ export default function NewListingScreen({ navigation }) {
   const [errors, setErrors] = useState({})
   const [camera, setCamera] = useState(false)
   const newListingToast = useToast()
+  const createListingrUrl = "https://trade-bench-server.onrender.com/listings"
 
-
-
-
-
-
+  
   const numbers = [];
   for (let i = 0; i < 100; i++) {
     numbers.push(i);
@@ -41,40 +39,55 @@ export default function NewListingScreen({ navigation }) {
 
   const validate = () => {
 
-    // if (formData.name === undefined) {
-    //   setErrors({ ...errors,
-    //     name: 'Name is required'
-    //   });
-    //   return false;
-    // } else if (formData.name.length < 3) {
-    //   setErrors({ ...errors,
-    //     name: 'Name is too short'
-    //   });
+    //  if(!photo.photo){
+    //   newListingToast.show({
+    //     title: "You have to take a picture of your listing so others can see it",
+    //     variant: "subtle",
+    //     description: "Please take the time to snap a picture of your listing"
+    //   })
+    //   return false
+    //  }
+    // if(!formData.category){
+    //   newListingToast.show({
+    //     title: "please choose at least one category ",
+    //     variant: "subtle",
+    //     description: "Every listing needs at least one category"
+    //   })
     //   return false;
     // }
-
-    return true;
+    // if(!formData.amount){
+    //   newListingToast.show({
+    //     title: "Must have at least one item  ",
+    //     variant: "subtle",
+    //     description: "Every listing needs at least one item in it"
+    //   })
+    //   return false;
+    // }
+    return true
   };
 
   const onSubmit = () => {
     //TODO: Complete form data validation and pass form Data to server
-    validate() ? console.log("Submitted") : newListingToast.show({
-      title: "Sorry, Something Went Wrong",
-      variant: "subtle",
-      description: "Please make sure all fields are filled out correctly"
-    });
-
-    console.log(formData)
-    console.log(photo.photo)
-    clearPhoto()
-    navigation.navigate("MapScreen");
-    newListingToast.show({
-      title: "Sucssess",
-      variant: "subtle",
-      placement:"top",
-      description: "Your new listing in now visible for everyone to see"
+   if ( validate()) {
+        console.log(formData)
+        console.log(photo.photo)
+        createListingRequest(formData).then( () => {
+              clearPhoto()
+         
+          newListingToast.show({
+          title: "Sucssess",
+          variant: "subtle",
+          placement:"top",
+          description: "Your new listing in now visible for everyone to see"
+      })
+          navigation.navigate("MapScreen");
+      }
+    ).catch((error)=> {
+      console.log("error in then" + error)
     })
-  };
+     
+   } 
+  }
 
   const openCamera = () => {
     console.log("click");
@@ -104,6 +117,39 @@ export default function NewListingScreen({ navigation }) {
 
 
 
+  const createListingRequest = async (formData) => {
+    // console.log("1. create user")
+
+    console.log(" priniting coordinate"+location.longitude,location.latitude)
+    try {
+        const listingRequest = await axios({
+          method: 'POST',
+          url: createListingrUrl,
+          withCredentials: true,
+          data:   {
+            location: {
+                type: "Point",
+                coordinates: [
+                  location.location.coords.longitude,
+                  location.location.coords.latitude
+                ]
+            },
+            number_of_items: formData.amount,
+            tags: [
+                formData.category
+            ],
+            images: [
+                photo.photo
+            ]
+        },
+        })
+        console.log({listingRequest})
+      } catch(error){
+          console.log("error in function" + error)
+          return
+      }
+  }
+
   return (
     <ImageBackground
       source={require("../assets/images/AddListingBackDrop.png")}
@@ -114,7 +160,7 @@ export default function NewListingScreen({ navigation }) {
       <Center h="100%">
         <VStack width="90%" mx="3" maxW="300px">
           <Heading mb="50">Let's Create a New Listing!</Heading>
-          <FormControl isRequired isInvalid={"listing-title" in errors}>
+          {/* <FormControl isRequired isInvalid={"listing-title" in errors}>
             <FormControl.Label
               _text={{
                 bold: true,
@@ -130,7 +176,7 @@ export default function NewListingScreen({ navigation }) {
                 setFormData({ ...formData, title: value })
               }
             />
-          </FormControl>
+          </FormControl> */}
 
           <FormControl maxW="300">
             <FormControl.Label>Choose Category</FormControl.Label>

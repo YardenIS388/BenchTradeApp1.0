@@ -20,16 +20,15 @@ import {
   ScrollView,
 } from "native-base";
 import { UserContext } from "../context/authentication.context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
 
-export default function RegisterScreen() {
+export default function RegisterScreen({navigation}) {
 
   const { login } = useContext(UserContext);
   const [registerData, setLoginData] = useState({});
 
   const loginErrorToast = useToast();
-  const registerUrl = "http://30.30.2.218:8081/users";
+  const registerUrl = "https://trade-bench-server.onrender.com/users";
 
   function containsWhitespace(str) {
     return /\s/g.test(str);
@@ -63,37 +62,9 @@ export default function RegisterScreen() {
     // simple validations passed and there is a point to try oerfirm the request
 
     createUserRequest(registerData);
-    //createUserRequest(loginData)
-    //   try{
-    //   const register = axios.post("http://localhost:8082/users" , {
-    //       email:loginData.email,
-    //       fullName: loginData. fullName,
-    //       password: loginData.password
-    //   })
-
-    //   console.log(register)
-    // }
-    // catch(e) {
-    //   console.log(e)
-    // }
-
-    // const loginRequest = axios.post(loginUrl, {
-    //     email: loginData.email,
-    //     password: loginData.password,
-    //  //   TODO: add missing fields for register action and figure out the correct root.
-    //   });
-    //   const loginString = JSON.stringify(loginRequest);
-    //   console.log({ loginData });
-    //   console.log(loginRequest);
-
-    // loginString
-    //   ? login({ name: loginData.email, token: loginString })
-    //   : loginErrorToast.show({
-    //       description: "Oops, looks like something whent wrong.",
-    //     });
   };
 
-  const createUserRequest = async (loginData) => {
+  const createUserRequest = async (registerData) => {
     // console.log("1. create user")
 
     try {
@@ -101,14 +72,18 @@ export default function RegisterScreen() {
         method: 'POST',
         url: registerUrl,
         withCredentials: true,
-        data: { email: loginData.email, password: loginData.password },
+        data: { fullName: registerData.fullName, email: registerData.email, password: registerData.password },
       });
-  
+       
       // check if request returned a successful status code
-      if (registerRequest.status === 200 && registerRequest.data) {
+      if (registerRequest.data) {
         // convert response to string and pass it to login function
-        const registerString = JSON.stringify(loginRequest.data);
-        login({ name: loginData.email, token: registerString });
+        const registerString = JSON.stringify(registerRequest.data);
+        console.log({registerDataL:registerData.email})
+        //TODO: make sure this authenticates the stack and moves user to home screen 
+        loginErrorToast.show({description:"Great! user created sucssefully "})
+        //navigation.navigate('Login')
+        login({ name: registerData.email, token: registerString });
       } else {
         loginErrorToast.show({
           description: "Seems there was an error with your registration info",
@@ -179,7 +154,7 @@ export default function RegisterScreen() {
                     height="50"
                     placeholder="Your name"
                     onChangeText={(value) =>
-                      setLoginData({ ...loginData, fullName: value })
+                      setLoginData({ ...registerData, fullName: value })
                     }
                   />
                 </FormControl>
@@ -190,7 +165,7 @@ export default function RegisterScreen() {
                     height="50"
                     placeholder="Your email"
                     onChangeText={(value) =>
-                      setLoginData({ ...loginData, email: value })
+                      setLoginData({ ...registerData, email: value })
                     }
                   />
                 </FormControl>
@@ -203,7 +178,7 @@ export default function RegisterScreen() {
                     height="50"
                     placeholder="Your password"
                     onChangeText={(value) =>
-                      setLoginData({ ...loginData, password: value })
+                      setLoginData({ ...registerData, password: value })
                     }
                   />
                 </FormControl>
@@ -216,7 +191,7 @@ export default function RegisterScreen() {
                     height="50"
                     placeholder="Your password"
                     onChangeText={(value) =>
-                      setLoginData({ ...loginData, confirmPassword: value })
+                      setLoginData({ ...registerData, confirmPassword: value })
                     }
                   />
                 </FormControl>

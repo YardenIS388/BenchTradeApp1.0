@@ -17,14 +17,14 @@ import {
 import { BlurView } from 'expo-blur';
 import { useState, useEffect } from "react";
 import { FontAwesome, MaterialIcons, AntDesign} from "@expo/vector-icons";
-import sortedMarkers from "../sortedLocations.json"
-import notSortedMarkers from "../fakeLocations.json"
+
+
 
 const LocationCardsMenu = (props) => {
 
   const [isTimePressed, setTimePressed] = useState(false);
   const [isLocationPressed, setLocationPressed] = useState(false);
-  const [markersList, setMarkersList] = useState(notSortedMarkers)
+  const [markersList, setMarkersList] = useState(props.listings)
 
   //filter buttons UI state 
   const toggleTimePress = () => { 
@@ -42,21 +42,15 @@ const LocationCardsMenu = (props) => {
   }
 
 useEffect(()=>{
-  if(isTimePressed){
-    setMarkersList(sortedMarkers)
-  } else {
-    setMarkersList(notSortedMarkers)
-  }
+  // fetchListings()
+  // if(isTimePressed){
+  //   setMarkersList(sortedMarkers)
+  // } else {
+  //   setMarkersList(notSortedMarkers)
+  // }
 })
 
-  return (
-    // <Center>
-    //   <Pressable onPress={onOpen} position="absolute" bottom="50" borderRadius="full" bg="white" borderWidth="1" borderColor="light.200" p="3" shadow="4">
-    //       <MaterialCommunityIcons name="view-carousel-outline" size={50} color="black" />
-    //   </Pressable>
-    //   <Actionsheet isOpen={isOpen} onClose={onClose} >
-    //     <Actionsheet.Content>
-   
+  return (   
           <Box  position="absolute" bottom="0" bg="rgba(255,255,255,0.5)">
             <BlurView intasity="20">
             <HStack
@@ -91,7 +85,7 @@ useEffect(()=>{
             </HStack>
             <ScrollView horizontal={true}>
               {markersList.map((marker) => {
-                return <Card key={marker.id} markerObj={marker}></Card>;
+                return <Card key={marker._id} markerObj={marker}></Card>;
               })}
             </ScrollView>
            </BlurView>
@@ -111,7 +105,8 @@ const Card = (props) => {
   const [showModal, setShowModal] = useState(false);
   const onCardPress = (e) => {
     setShowModal(true)
-    console.log(props.markerObj.id)
+    console.log( props.markerObj )
+    console.log(props.markerObj._id)
     console.log( e.target)
   };
   const now = new Date();
@@ -144,7 +139,7 @@ const Card = (props) => {
             <Image
               //TODO: update to actual img uri
               source={{
-                uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg",
+                uri: props.markerObj.images[0],
               }}
               alt="image"
             />
@@ -167,17 +162,17 @@ const Card = (props) => {
             py="1.5"
           >
             <HStack justifyContent="center" alignItems="center">
-              <FontAwesome name="location-arrow" size={14} color="light.100" />
-              <Text color="light.100"> 0.6 km </Text>
+              <FontAwesome name="location-arrow" size={14} color="white" />
+              <Text color="light.100"> {props.markerObj.distance} km </Text>
             </HStack>
           </Center>
         </Box>
         <Stack p="4" space={3}>
           <Stack space={2}>
             <Heading size="sm" ml="-1">
-              {props.markerObj.name}
+              From: 24.04.23
             </Heading>
-            <Text
+            {/* <Text
               fontSize="xs"
               _light={{
                 color: "emerald.500",
@@ -190,10 +185,10 @@ const Card = (props) => {
               mt="-1"
             >
               {props.markerObj.username}
-            </Text>
+            </Text> */}
           </Stack>
-          <HStack>
-            {props.markerObj.categories.map((category, index) => {
+          <HStack flexWrap>
+            {props.markerObj.tags.map((category, index) => {
               return (
                 <Badge
                   h="6"
@@ -216,8 +211,7 @@ const Card = (props) => {
                 }}
                 fontWeight="400"
               >
-                {now - (props.markerObj.created_at / 1000) * 60 * 60 * 24} days
-                ago
+                {props.markerObj.number_of_items } items
               </Text>
             </HStack>
           </HStack>
@@ -235,7 +229,7 @@ const Card = (props) => {
               borderRadius="5"
               //TODO: update to actual img uri
               source={{
-                uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg",
+                uri: props.markerObj.images[0],
               }}
               alt="image"
             />

@@ -17,6 +17,7 @@ import {
   HStack,
   Button,
   Text,
+  Spinner
 } from "native-base";
 import { Link } from "@react-navigation/native";
 import { UserContext } from "../context/authentication.context";
@@ -29,13 +30,14 @@ import axios from "axios";
 export default function LoginScreen() {
   const { login } = useContext(UserContext);
   const [loginData, setLoginData] = useState({});
+  const [loading, setLoading] = useState(false)
 
   const loginErrorToast = useToast();
-  const loginUrl = "http://30.30.2.218:8081/auth/login";
-
+  const loginUrl = "https://trade-bench-server.onrender.com/auth/login";
+ 
 
   const loginHandler = async (e) => {
-    console.log("login handler")
+    setLoading(true)
     try {
       const loginRequest = await axios({
         method: 'POST',
@@ -137,7 +139,13 @@ export default function LoginScreen() {
                   </Link>
                 </FormControl>
                 <Button mt="2" colorScheme="emerald" onPress={loginHandler}>
-                  Sign in
+                  
+                  {loading ?  
+                  <HStack justifyContent="space-around" width="100"> 
+                      <Spinner accessibilityLabel="Loading posts" color="white"/>
+                      <Heading color="white" fontSize="sm">Loading </Heading> 
+                  </HStack>: 
+                  "Sign in"}
                 </Button>
                 <HStack mt="6" justifyContent="center">
                   <Text

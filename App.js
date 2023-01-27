@@ -7,17 +7,23 @@ import {
 import { NativeBaseProvider } from "native-base";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthStack from "./routes/authStack";
-import { UserProvider, CameraProvider } from "./context/authentication.context";
+import {
+  UserProvider,
+  CameraProvider,
+  LocationProvider,
+} from "./context/authentication.context";
 
 export default function App() {
   return (
     <UserProvider>
       <CameraProvider>
-        <NativeBaseProvider>
-          <NavigationContainer>
-            <AuthStack></AuthStack>
-          </NavigationContainer>
-        </NativeBaseProvider>
+        <LocationProvider>
+          <NativeBaseProvider>
+            <NavigationContainer>
+              <AuthStack></AuthStack>
+            </NavigationContainer>
+          </NativeBaseProvider>
+        </LocationProvider>
       </CameraProvider>
     </UserProvider>
   );

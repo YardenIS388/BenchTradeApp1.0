@@ -57,3 +57,30 @@ export const CameraProvider = ({children }) => {
       </CameraContext.Provider>
   )
 }
+
+
+export const LocationContext = createContext({location: null})
+export const LocationProvider = ({children }) => {
+
+  const [location, setLocation] = useState({})
+  console.log(location)
+  const setNewLocation = (currentLocation) => {
+      console.log("|calling setNewLocation")
+      setLocation((location) => ({
+          location: currentLocation
+      })
+    )
+  }
+
+  const clearLocation = () => {
+      setLocation((location) => ({
+        location: null
+      }));
+    };
+
+  return (
+      <LocationContext.Provider value = {{location, setNewLocation, clearLocation}}>
+          {children}
+      </LocationContext.Provider>
+  )
+}
