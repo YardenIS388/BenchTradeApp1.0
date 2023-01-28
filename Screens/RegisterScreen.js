@@ -39,7 +39,7 @@ export default function RegisterScreen({navigation}) {
   }
 
   const registerHandler = (e) => {
-    console.log("register handler");
+    //console.log("register handler");
     if (containsWhitespace(registerData.name)) {
       loginErrorToast.show({
         description: "Name is excpected to be two words with a space between ",

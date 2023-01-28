@@ -11,6 +11,7 @@ import {
   UserProvider,
   CameraProvider,
   LocationProvider,
+  RenderProvider,
 } from "./context/authentication.context";
 
 export default function App() {
@@ -18,11 +19,13 @@ export default function App() {
     <UserProvider>
       <CameraProvider>
         <LocationProvider>
-          <NativeBaseProvider>
-            <NavigationContainer>
-              <AuthStack></AuthStack>
-            </NavigationContainer>
-          </NativeBaseProvider>
+          <RenderProvider>
+            <NativeBaseProvider>
+              <NavigationContainer>
+                <AuthStack></AuthStack>
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </RenderProvider>
         </LocationProvider>
       </CameraProvider>
     </UserProvider>

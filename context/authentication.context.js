@@ -1,4 +1,4 @@
-import React, { createContext,useState } from "react";
+import React, { createContext,useState, useMemo } from "react";
 
 
 
@@ -66,7 +66,8 @@ export const LocationProvider = ({children }) => {
   const setNewLocation = (currentLocation) => {
       //console.log("|calling setNewLocation")
       setLocation((location) => ({
-          location: currentLocation
+          location: currentLocation,
+          loaded: 0
       })
     )
   }
@@ -77,9 +78,31 @@ export const LocationProvider = ({children }) => {
       }));
     };
 
+    const providerValue = useMemo(() => ({ location, setNewLocation, clearLocation }), [location]);
+
   return (
-      <LocationContext.Provider value = {{location, setNewLocation, clearLocation}}>
+      <LocationContext.Provider value = {providerValue}>
           {children}
       </LocationContext.Provider>
+  )
+}
+
+
+export const RenderContext = createContext({})
+export const RenderProvider = ({children }) => {
+
+  const [render, setRender] = useState({})
+  const setRenderNow = (currentLocation) => {
+      //console.log("new response context")
+      setRender((response) => ({ response })
+    )
+  }
+
+
+
+  return (
+      <RenderContext.Provider value = {{render, setRenderNow}}>
+          {children}
+      </RenderContext.Provider>
   )
 }

@@ -102,7 +102,7 @@ export default function CameraUtil(props) {
             borderWidth="5"
             mb="20"
             borderColor="white"
-            borderRadius="full"
+            borderRadius={100}
             w="70"
             h="70"
             alignSelf="center"
@@ -155,30 +155,36 @@ const CameraPreview = ({ photo, handleDiscard, makePreviewUnvisible }) => {
         justifyContent="space-between"
         alignItems="center"
         flexDirection="row"
-        p="8"
+        p={5}
       >
         <Pressable
-          borderRadius="10"
-          w="40"
+          borderRadius={10}
+          w="45%"
           h="10"
           borderColor="white"
           borderWidth="2"
           justifyContent="center"
           alignItems="center"
+          _pressed={{
+            bg:"rgba(255,255,255,0.5)"
+          }}
           onPress={handleDiscard}
         >
           <Text color="white">Discard</Text>
         </Pressable>
         <Pressable
           bg="emerald.500"
-          borderRadius="10"
-          w="40"
+          borderRadius={10}
+          w="45%"
           h="10"
           borderColor="white"
           borderWidth="2"
           justifyContent="center"
           alignItems="center"
           onPress={usePhoto}
+          _pressed={{
+            bg:"emerald.300"
+          }}
         >
           <Text color="white">Use Photo</Text>
         </Pressable>

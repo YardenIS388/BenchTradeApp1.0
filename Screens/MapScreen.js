@@ -8,56 +8,92 @@ import LocationCardsMenuSkeleton from "../components/LocationCardsSkeleton";
 import LocationCardsMenu from "../components/LocationCardsMenu";
 import MenuComponent from "../components/Menu";
 import axios from "axios";
-import { LocationContext } from "../context/authentication.context";
+import {
+  LocationContext,
+  RenderContext,
+} from "../context/authentication.context";
 import { useFocusEffect } from "@react-navigation/native";
 
 const findAllListings = "https://trade-bench-server.onrender.com/listings";
+
 export default function MapScreen({ navigation }) {
   const { setNewLocation } = useContext(LocationContext);
   const { location } = useContext(LocationContext);
+  const { render } = useContext(RenderContext);
   const [listings, setListings] = useState([]);
   const [mapRegion, setMapRegion] = useState(null);
   const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
   const [loadingListings, setLoadingListings] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
-    getLocationAsync();
-  }, []);
+    (async () => {
+      //console.log("MapScreen useEffect Trigger");
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
 
-  const fetchListingsWithDistanceCallback = useCallback(() => {
-    if (location.location) {
-      const lat = location.location.coords.latitude;
-      const lon = location.location.coords.longitude;
-      fetchListingsWithDistance(lat, lon);
-    }
-  }, [location]);
+      let coordinate = await Location.getCurrentPositionAsync({});
+      //console.log(coordinate);
+      setNewLocation(coordinate);
+      setMapRegion({
+        latitude: coordinate.coords.latitude,
+        longitude: coordinate.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+      const lat = coordinate.coords.latitude;
+      const lon = coordinate.coords.longitude;
+      const response = await fetchListingsWithDistance(lat, lon);
+      //console.log(response.data)
+      //console.log(response.data.length)
+      setListings(response.data);
+      setLoadingListings(false);
+    })();
 
-  useFocusEffect(fetchListingsWithDistanceCallback);
+    //  getLocationAsync()
+    //  .then(res => {
+    //   console.log(location.location)
+    //   if (location.location) {
+    //     const lat = location.location.coords.latitude;
+    //     const lon = location.location.coords.longitude;
+    //     fetchListingsWithDistance(lat, lon);
+    //   }
+    //  }).catch(error => console.log(error))
+  }, [render]);
 
   const handleMapRegionChange = (region) => {
     // console.log(region);
   };
 
-  const getLocationAsync = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setLocationResult("Permission to access location was denied");
-    } else {
-      setHasLocationPermissions(true);
-    }
+  // const getLocationAsync = async () => {
 
-    let location = await Location.getCurrentPositionAsync({});
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
 
-    setNewLocation(location);
+  //   console.log("status "+ status)
 
-    // Center the map on the location we just fetched.
-    setMapRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
-  };
+  //   if (status !== "granted" ) {
+  //     console.log("if")
+  //     setLocationResult("Permission to access location was denied");
+  //     return
+  //   }
+
+  //   let coordinate = await Location.getCurrentPositionAsync({});
+  //   if(coordinate != location){
+  //     setNewLocation(coordinate);
+  //     setMapRegion({
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //       latitudeDelta: 0.0922,
+  //       longitudeDelta: 0.0421,
+  //     });
+  //   }
+
+  //   // Center the map on the location we just fetched.
+
+  // };
 
   const fetchListings = async () => {
     try {
@@ -74,22 +110,25 @@ export default function MapScreen({ navigation }) {
   };
 
   const fetchListingsWithDistance = async (lat, lon) => {
+    //console.log("fetch listing is called");
     const listingsRequest = await axios({
       method: "GET",
       url: `https://trade-bench-server.onrender.com/listings/nearest?lat=${lat}&lon=${lon}`,
       withCredentials: true,
-    })
-      .then((response) => {
-        setListings(response.data);
-        setLoadingListings(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    });
+
+    return listingsRequest
+    // .then((response) => {
+    //   setListings(response.data);
+    //   setLoadingListings(false);
+    // })
+    // .catch((error) => {
+    //   console.log(error);
+    // });
   };
 
   const mapMarkers = () => {
-    console.log("list")
+   // console.log("list");
     if (listings) {
       return listings.map((listing, index) => (
         <Marker
@@ -115,7 +154,6 @@ export default function MapScreen({ navigation }) {
         onRegionChange={handleMapRegionChange}
         showsUserLocation={true}
       >
-  
         {mapMarkers()}
       </MapView>
 
@@ -123,7 +161,7 @@ export default function MapScreen({ navigation }) {
       {loadingListings ? (
         <LocationCardsMenuSkeleton> </LocationCardsMenuSkeleton>
       ) : (
-        <LocationCardsMenu listings={listings ? listings : null}>
+        <LocationCardsMenu listings={listings}>
           {" "}
         </LocationCardsMenu>
       )}

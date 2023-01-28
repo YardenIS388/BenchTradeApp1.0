@@ -15,8 +15,8 @@ import {UserContext} from "../context/authentication.context"
 const MenuComponent = () => {
 
   const {logout} = useContext(UserContext)
+  const {user} = useContext(UserContext)
   const [modalVisible, setModalVisible] = useState(false);
-
   return (
     <View
       position="absolute"
@@ -53,11 +53,12 @@ const MenuComponent = () => {
               paddingBottom="5"
               h="100%"
             >
-              <Avatar
-                source={require("../assets/images/profile.png")}
-                marginRight="10"
+              <Avatar borderWidth={3} borderColor="white"
+                source={{uri:"https://source.unsplash.com/random/250×250/?fruit"}}
+                marginRight={14}
+                size={16}
               ></Avatar>
-              <Text> User Name</Text>
+              <Text fontSize={18}> {user.name}</Text>
             </HStack>
           </Modal.Body>
           <Modal.Footer justifyContent="flex-start" p="0">

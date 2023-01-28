@@ -22,11 +22,15 @@ import CameraUtil from "../components/CameraUtil";
 import {
   CameraContext,
   LocationContext,
+  RenderContext
 } from "../context/authentication.context";
 import axios from "axios";
+
+
 export default function NewListingScreen({ navigation }) {
-  const { location } = useContext(LocationContext);
-  const { photo } = useContext(CameraContext);
+  const { location }   = useContext(LocationContext);
+  const { photo }      = useContext(CameraContext);
+  const {setRenderNow} =  useContext(RenderContext)
   const { clearPhoto } = useContext(CameraContext);
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({});
@@ -101,9 +105,11 @@ export default function NewListingScreen({ navigation }) {
     }
   };
 
-  const createListingRequest = async (formData) => {
+  const createListingRequest = (formData) => {
+
+    //console.log({formData})
     setLoading(true)
-    const listingRequest = await axios({
+      axios({
       method: "POST",
       url: createListingrUrl,
       withCredentials: true,
@@ -124,7 +130,8 @@ export default function NewListingScreen({ navigation }) {
         if (response.status == 201) {
           clearPhoto();
           setLoading(false)
-          navigation.navigate("MapScreen")
+          setRenderNow(response)
+          navigation.navigate("MapScreen" , {refresh: true})
           newListingToast.show({
             title: "Sucssess",
             variant: "subtle",
@@ -138,12 +145,12 @@ export default function NewListingScreen({ navigation }) {
             title: "Somehing Went Wrong",
             variant: "subtle",
             placement: "top",
-            description: "Sorry, ww could not process that request",
+            description: "Sorry, we could not process that request",
           })
         }
       })
       .catch((error) => {
-        console.log("error in then" + error);
+        //console.log("error in then" + error);
         newListingToast.show({
           title: "Failure",
           variant: "subtle",
@@ -188,8 +195,10 @@ export default function NewListingScreen({ navigation }) {
               height="50"
               accessibilityLabel="Choose Category"
               placeholder="Choose Category"
-              onValueChange={(value) =>
-                setFormData({ ...formData, categoty: value })
+              onValueChange={(value) => {
+               // console.log(value)
+                setFormData({ ...formData, category: value })
+              }
               }
               _selectedItem={{
                 bg: "teal.200",
@@ -239,7 +248,7 @@ export default function NewListingScreen({ navigation }) {
             <Pressable
               borderWidth={1}
               borderStyle="dashed"
-              borderRadius="4"
+              borderRadius={4}
               borderColor="muted.300"
               height="250"
               justifyContent="center"
@@ -254,12 +263,12 @@ export default function NewListingScreen({ navigation }) {
                   style={{ position: "absolute" }}
                 />
               ) : null}
-              <View borderRadius="4" w="100%" h="100%">
+              <View borderRadius={4} w="100%" h="100%">
                 {photo.photo ? (
                   <ImageBackground
                     key={photo.photo}
                     resizeMode="cover"
-                    borderRadius="4"
+                    borderRadius={4}
                     style={{ flex: 1 }}
                     source={{ uri: photo.photo }}
                     alt="watermelon"

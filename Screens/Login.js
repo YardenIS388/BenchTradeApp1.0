@@ -90,7 +90,7 @@ export default function LoginScreen() {
         <View>
           <Center w="100%" alignItems="center">
             <Box safeArea w="80%" h="100%">
-              <Image style={{width: '100%' ,resizeMode:'contain', marginBottom:100}} source={require("../assets/images/TradeBenchLogin.png")} />
+              <Image style={{width: '100%' ,resizeMode:'contain', marginBottom:80}} source={require("../assets/images/TradeBenchLogin.png")} />
               <Heading
                 size="lg"
                 fontWeight="600"
@@ -144,7 +144,7 @@ export default function LoginScreen() {
                     Forget Password?
                   </Link>
                 </FormControl>
-                <Button mt="2" h="50" colorScheme="emerald" onPress={loginHandler}>
+                <Button mt="10" h="50" colorScheme="emerald" onPress={loginHandler}>
                   
                   {loading ?  
                   <HStack justifyContent="space-around" width="100"> 

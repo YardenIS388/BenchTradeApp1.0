@@ -12,22 +12,32 @@ import {
   Image,
   Badge,
   Modal,
+  FormControl,
+  Select,
   Button,
   Skeleton,
   VStack,
   Link,
-  Popover
+  useToast,
+  CheckIcon,
 } from "native-base";
 import { BlurView } from "expo-blur";
-import { useState, useEffect } from "react";
-import { FontAwesome, MaterialIcons, AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState, useEffect, useContext } from "react";
+import {
+  FontAwesome,
+  MaterialIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import {  RenderContext,} from "../context/authentication.context";
 import axios from "axios";
-
 
 const LocationCardsMenu = (props) => {
   const [isTimePressed, setTimePressed] = useState(false);
   const [isLocationPressed, setLocationPressed] = useState(false);
-  const [markersList, setMarkersList] = useState(props.listings);
+
+
+  //const [markersList, setMarkersList] = useState(props.listings);
 
   //filter buttons UI state
   const toggleTimePress = () => {
@@ -43,9 +53,7 @@ const LocationCardsMenu = (props) => {
     setLocationPressed((previousState) => !previousState);
   };
 
-  useEffect(() => {
- 
-  }, []);
+  useEffect(() => {}, [props.listings]);
 
   return (
     <Box position="absolute" w="100%" bottom="0" bg="rgba(255,255,255,0.5)">
@@ -79,35 +87,67 @@ const LocationCardsMenu = (props) => {
           </HStack>
         </HStack>
         <ScrollView horizontal={true} h="300" w="100%">
-          {
-            markersList.map((marker) => {
-              return <Card key={marker._id} markerObj={marker}></Card>;
-            })
-          }
+          {props.listings.map((marker) => {
+            return <Card key={marker._id} markerObj={marker}></Card>;
+          })}
         </ScrollView>
       </BlurView>
     </Box>
-
-    //         </Actionsheet.Content>
-    //       </Actionsheet>
-    //     </Center>
-  )
-}
+  );
+};
 
 export default LocationCardsMenu;
 
 const Card = (props) => {
-
+  const [itemAmount, setItemAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const {setRenderNow} =  useContext(RenderContext)
+  const cardToast = useToast()
+
+  const itemsLeft = Array.from(
+    { length: props.markerObj.number_of_items + 1 },
+    (_, i) => i
+  );
   const onCardPress = (e) => {
     setShowModal(true);
     // console.log(props.markerObj);
     // console.log(props.markerObj._id);
     // console.log(e.target);
   };
-    const lat = props.markerObj.location.coordinates[1]
-    const lon = props.markerObj.location.coordinates[0]
-    const navLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}` 
+  const lat = props.markerObj.location.coordinates[1];
+  const lon = props.markerObj.location.coordinates[0];
+  const navLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
+  const updateAmount = (listingId)=> {
+    
+    
+    const newAmount = parseInt(props.markerObj.number_of_items) - itemAmount
+    // console.log(props.markerObj.number_of_items, itemAmount, newAmount, listingId )
+    //const updatedAmount = {number_of_items: newAmount};
+    axios.put(
+        `https://trade-bench-server.onrender.com/listings/${listingId}`,
+        {
+          number_of_items: newAmount,
+        }
+      )
+      .then((response) => {
+       // console.log(response);
+        setShowModal(false);
+        setRenderNow(response)
+        
+        cardToast.show({
+          title: "Sucssess",
+          variant: "subtle",
+          placement: "top",
+          description: "The listing will be updated shortly",
+        })
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+  }
 
   const formatDate = (date) => {
     const dateString = date;
@@ -129,25 +169,40 @@ const Card = (props) => {
     return diffInHours;
   };
 
-
   const removeListing = (listingId) => {
-    
-    const updatedStatus = 'active';
-    axios.put(`https://trade-bench-server.onrender.com/listings/status/${listingId}`, {
-      status: updatedStatus
-    })
-    .then(response => {
-      console.log(response);
-      setShowModal(false)
-    })
-    .catch(error => {
-      console.error(error);
-    });
-  }
+    const updatedStatus = "disabled";
+    axios.put(
+        `https://trade-bench-server.onrender.com/listings/status/${listingId}`,
+        {
+          status: updatedStatus,
+        }
+      )
+      .then((response) => {
+        //console.log(response);
+        setShowModal(false);
+        setRenderNow(response)
+        cardToast.show({
+          title: "Sucssess",
+          variant: "subtle",
+          placement: "top",
+          description: "The listing will be removed from the list shortly",
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <>
-      <Pressable alignItems="center" ml="4" onPress={()=>{setShowModal(true)}} mb="5">
+      <Pressable
+        alignItems="center"
+        ml="4"
+        onPress={() => {
+          setShowModal(true);
+        }}
+        mb="5"
+      >
         <Box
           maxW="80"
           w="200"
@@ -171,7 +226,6 @@ const Card = (props) => {
           <Box>
             <AspectRatio w="100%" ratio={16 / 9}>
               <Image
-          
                 source={{
                   uri: props.markerObj.images[0],
                 }}
@@ -197,7 +251,10 @@ const Card = (props) => {
             >
               <HStack justifyContent="center" alignItems="center">
                 <FontAwesome name="location-arrow" size={14} color="white" />
-                <Text color="light.100"> {Math.floor(props.markerObj.distance)} km </Text>
+                <Text color="light.100">
+                  {" "}
+                  {Math.floor(props.markerObj.distance)} m{" "}
+                </Text>
               </HStack>
             </Center>
           </Box>
@@ -208,7 +265,7 @@ const Card = (props) => {
               </Heading>
               <Text>{getDiffInHours(props.markerObj.createdAt)} hours ago</Text>
             </Stack>
-            <HStack flexWrap>
+            <HStack>
               {props.markerObj.tags.map((category, index) => {
                 return (
                   <Badge
@@ -252,7 +309,7 @@ const Card = (props) => {
           <Modal.CloseButton />
           <Modal.Header>Listing Info</Modal.Header>
           <Modal.Body>
-            <AspectRatio w="100%" ratio={16 / 9} mb="55">
+            <AspectRatio w="100%" ratio={16 / 9} mb={5}>
               <Image
                 borderRadius="5"
                 source={{
@@ -261,47 +318,96 @@ const Card = (props) => {
                 alt="image"
               />
             </AspectRatio>
-            <Heading mt="2" >Listing From: {formatDate(props.markerObj.createdAt)}</Heading>
-            <Text mt="2" fontSize="lg"> Distance: {Math.floor(props.markerObj.distance)} km away </Text>
-            <Text mt="2"  fontSize="lg">Amount:   {props.markerObj.number_of_items} </Text>
-            <Text mt="2"  fontSize="lg">Last Updated: {formatDate(props.markerObj.updatedAt)} </Text>
+            <Heading mt="2">
+              Listing From: {formatDate(props.markerObj.createdAt)}
+            </Heading>
+            <Text mt="2" fontSize="lg">
+              {" "}
+              Distance: {Math.floor(props.markerObj.distance)}m away{" "}
+            </Text>
+            <Text mt="2" fontSize="lg">
+              Amount: {props.markerObj.number_of_items}{" "}
+            </Text>
+            <Text mt="2" fontSize="lg">
+              Last Updated: {formatDate(props.markerObj.updatedAt)}{" "}
+            </Text>
+
+            <VStack mt={25} borderWidth={1} borderColor="emerald.500"  pb={2} borderRadius={5} alignItems="center">
+              <Text fontSize="lg" mb={5} py="5" w="100%" bg="emerald.100" textAlign="center" borderRadiusTop={5}>
+                How many items are you taking?
+              </Text>
+              <VStack w="85%" mb={5}>
+
+              <FormControl mb={5}>
+                  <Select
+                  backgroundColor="muted.100"
+                  height="50"
+                  accessibilityLabel="How many items?"
+                  value={1}
+                  onValueChange={(value) => setItemAmount(value)}
+                  _selectedItem={{
+                    bg: "teal.200",
+                    endIcon: <CheckIcon size={5} />,
+                  }}
+                >
+                  {itemsLeft.map((item, index) => {
+                    return (
+                      <Select.Item
+                        key={index}
+                        label={String(index)}
+                        value={String(index)}
+                      />
+                    );
+                  })}
+                  </Select>
+                </FormControl>
+                <Pressable
+                // w="150"
+                h="50"
+                flexDirection="row"
+                alignItems="center"
+                bg="emerald.300"
+                borderWidth="2"
+                borderColor="emerald.400"
+                borderRadius="5"
+                pl="1"
+                _pressed={{ bg: "emerald.500" }}
+                onPress={() => {
+                updateAmount(props.markerObj._id);
+              }}
+              >
+                <AntDesign name="tagso" size={24} color="text.900" />
+                <Text> Grab Items </Text>
+                </Pressable>
+
+               
+              </VStack>
+            </VStack>
+
           </Modal.Body>
           <Modal.Footer justifyContent="space-between" h="20">
-            <Pressable
-              w="30%"
+            <Link
+              href={navLink}
+              bg="primary.100"
+              w="32%"
               h="90%"
-              flexDirection="row"
+              color="black"
+              justifyContent="center"
               alignItems="center"
-              bg="emerald.300"
+              borderColor="primary.400"
               borderWidth="2"
-              borderColor="emerald.400"
-              borderRadius="5"
-              pl="1"
-              _pressed={
-                {bg:"emerald.500"}
-              }
+              rounded="sm"
+              _pressed={{ bg: "primary.500" }}
             >
-              <AntDesign name="tagso" size={24} color="text.900" />
-              <Text> Grab Item </Text>
-            </Pressable>
-            <Link href= {navLink}
-                  bg="primary.100" 
-                  w="30%" 
-                  h="90%" 
-                  color="black" 
-                  justifyContent="center" 
-                  alignItems="center" 
-                  borderColor="primary.400" 
-                  borderWidth="2" 
-                  rounded="sm"
-                  _pressed={
-                {bg:"primary.500"}
-              }> 
-                  <MaterialCommunityIcons name="navigation-variant-outline" size={22} color="black" />
-                  Navigate
-              </Link>
+              <MaterialCommunityIcons
+                name="navigation-variant-outline"
+                size={22}
+                color="black"
+              />
+              Navigate
+            </Link>
             <Pressable
-              w="30%"
+              w="32%"
               h="90%"
               flexDirection="row"
               alignItems="center"
@@ -310,8 +416,10 @@ const Card = (props) => {
               borderColor="red.400"
               borderRadius="5"
               pl="1"
-              _pressed={{bg:"red.500"}}
-              onPress={()=>{removeListing(props.markerObj._id)}}
+              _pressed={{ bg: "red.500" }}
+              onPress={() => {
+                removeListing(props.markerObj._id);
+              }}
             >
               <MaterialIcons name="block" size={22} color="black" />
               <Text> Not There </Text>
@@ -321,4 +429,4 @@ const Card = (props) => {
       </Modal>
     </>
   );
-}
+};
