@@ -15,11 +15,14 @@ import {
   Button,
   Skeleton,
   VStack,
-  Link
+  Link,
+  Popover
 } from "native-base";
 import { BlurView } from "expo-blur";
 import { useState, useEffect } from "react";
 import { FontAwesome, MaterialIcons, AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import axios from "axios";
+
 
 const LocationCardsMenu = (props) => {
   const [isTimePressed, setTimePressed] = useState(false);
@@ -45,7 +48,7 @@ const LocationCardsMenu = (props) => {
   }, []);
 
   return (
-    <Box position="absolute" bottom="0" bg="rgba(255,255,255,0.5)">
+    <Box position="absolute" w="100%" bottom="0" bg="rgba(255,255,255,0.5)">
       <BlurView intasity="20">
         <HStack justifyContent="space-between" p="3">
           <Heading>Around You</Heading>
@@ -75,7 +78,7 @@ const LocationCardsMenu = (props) => {
             </Pressable>
           </HStack>
         </HStack>
-        <ScrollView horizontal={true}>
+        <ScrollView horizontal={true} h="300" w="100%">
           {
             markersList.map((marker) => {
               return <Card key={marker._id} markerObj={marker}></Card>;
@@ -127,14 +130,24 @@ const Card = (props) => {
   };
 
 
-  const removeListing = (e) => {
-        console.log(e.target)
-        console.log("need to implement removie listing")
+  const removeListing = (listingId) => {
+    
+    const updatedStatus = 'active';
+    axios.put(`https://trade-bench-server.onrender.com/listings/status/${listingId}`, {
+      status: updatedStatus
+    })
+    .then(response => {
+      console.log(response);
+      setShowModal(false)
+    })
+    .catch(error => {
+      console.error(error);
+    });
   }
 
   return (
     <>
-      <Pressable alignItems="center" ml="4" onPress={onCardPress} mb="5">
+      <Pressable alignItems="center" ml="4" onPress={()=>{setShowModal(true)}} mb="5">
         <Box
           maxW="80"
           w="200"
@@ -194,20 +207,6 @@ const Card = (props) => {
                 From: {formatDate(props.markerObj.createdAt)}
               </Heading>
               <Text>{getDiffInHours(props.markerObj.createdAt)} hours ago</Text>
-              {/* <Text
-              fontSize="xs"
-              _light={{
-                color: "emerald.500",
-              }}
-              _dark={{
-                color: "emerald.400",
-              }}
-              fontWeight="500"
-              ml="-0.5"
-              mt="-1"
-            >
-              {props.markerObj.username}
-            </Text> */}
             </Stack>
             <HStack flexWrap>
               {props.markerObj.tags.map((category, index) => {
@@ -263,8 +262,8 @@ const Card = (props) => {
               />
             </AspectRatio>
             <Heading mt="2" >Listing From: {formatDate(props.markerObj.createdAt)}</Heading>
-            <Text mt="2" fontSize="lg">Distance: {Math.floor(props.markerObj.distance)} km away </Text>
-            <Text mt="2"  fontSize="lg">Amount:  {props.markerObj.number_of_items} </Text>
+            <Text mt="2" fontSize="lg"> Distance: {Math.floor(props.markerObj.distance)} km away </Text>
+            <Text mt="2"  fontSize="lg">Amount:   {props.markerObj.number_of_items} </Text>
             <Text mt="2"  fontSize="lg">Last Updated: {formatDate(props.markerObj.updatedAt)} </Text>
           </Modal.Body>
           <Modal.Footer justifyContent="space-between" h="20">
@@ -312,7 +311,7 @@ const Card = (props) => {
               borderRadius="5"
               pl="1"
               _pressed={{bg:"red.500"}}
-              onPress={removeListing}
+              onPress={()=>{removeListing(props.markerObj._id)}}
             >
               <MaterialIcons name="block" size={22} color="black" />
               <Text> Not There </Text>

@@ -15,12 +15,16 @@ import axios from "axios";
 export default function CameraUtil(props) {
   const cameraRef = useRef();
   const [type, setType] = useState(CameraType.back);
-  const [hasCameraPermission, setCameraPermission] =
-    Camera.useCameraPermissions();
+  const [hasCameraPermission, setCameraPermission] = Camera.useCameraPermissions();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [cloudImage, setCloudImage] = useState(null);
   const [cameraReady, setIsCameraReady] = useState(false);
+
+  
+
+
+   setCameraPermission( Camera.useCameraPermissions())
 
   if (!hasCameraPermission) {
     return <View />;
@@ -28,6 +32,10 @@ export default function CameraUtil(props) {
   if (!hasCameraPermission.granted) {
     return <Text>No access to camera</Text>;
   }
+
+
+
+
 
   const onCameraReady = () => {
     setIsCameraReady(true);
