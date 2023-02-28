@@ -13,11 +13,13 @@ import {
   Heading,
   VStack,
   FormControl,
+  Spinner,
   Input,
   Button,
   Pressable,
   HStack,
   ScrollView,
+  Text
 } from "native-base";
 import { UserContext } from "../context/authentication.context";
 import axios from "axios";
@@ -26,6 +28,7 @@ export default function RegisterScreen({navigation}) {
 
   const { login } = useContext(UserContext);
   const [registerData, setLoginData] = useState({});
+  const [loading, setLoading] = useState(false)
 
   const loginErrorToast = useToast();
   const registerUrl = "https://trade-bench-server.onrender.com/users";
@@ -40,6 +43,7 @@ export default function RegisterScreen({navigation}) {
 
   const registerHandler = (e) => {
     //console.log("register handler");
+    setLoading(true)
     if (containsWhitespace(registerData.name)) {
       loginErrorToast.show({
         description: "Name is excpected to be two words with a space between ",
@@ -60,8 +64,8 @@ export default function RegisterScreen({navigation}) {
       return;
     }
     // simple validations passed and there is a point to try oerfirm the request
-
     createUserRequest(registerData);
+    //setLoading(false)
   };
 
   const createUserRequest = async (registerData) => {
@@ -196,8 +200,14 @@ export default function RegisterScreen({navigation}) {
                   />
                 </FormControl>
 
-                <Button mt="2" colorScheme="emerald" h="50" onPress={registerHandler}>
-                  Sign up
+                <Button mt="10" h="50" colorScheme="emerald" onPress={registerHandler}>
+                  
+                  {loading ?  
+                  <HStack justifyContent="space-around" width="100"> 
+                      <Spinner accessibilityLabel="Loading posts" color="white"/>
+                      <Text color="white" fontSize="sm">Loading </Text> 
+                  </HStack>: 
+                  "Sign Up Now"}
                 </Button>
               </ScrollView>
 

@@ -25,6 +25,7 @@ export default function MapScreen({ navigation }) {
   const [hasLocationPermissions, setHasLocationPermissions] = useState(false);
   const [loadingListings, setLoadingListings] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const emptyArray = [];
 
   useEffect(() => {
     (async () => {

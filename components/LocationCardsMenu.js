@@ -20,8 +20,11 @@ import {
   Link,
   useToast,
   CheckIcon,
+  Spinner,
+  StatusBar,
 } from "native-base";
 import { BlurView } from "expo-blur";
+import { Link as NavigationLink } from "@react-navigation/native";
 import { useState, useEffect, useContext } from "react";
 import {
   FontAwesome,
@@ -29,13 +32,12 @@ import {
   AntDesign,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import {  RenderContext,} from "../context/authentication.context";
+import { RenderContext } from "../context/authentication.context";
 import axios from "axios";
 
 const LocationCardsMenu = (props) => {
   const [isTimePressed, setTimePressed] = useState(false);
   const [isLocationPressed, setLocationPressed] = useState(false);
-
 
   //const [markersList, setMarkersList] = useState(props.listings);
 
@@ -61,7 +63,7 @@ const LocationCardsMenu = (props) => {
         <HStack justifyContent="space-between" p="3">
           <Heading>Around You</Heading>
           <HStack borderRadius="full">
-            <Pressable
+            {/* <Pressable
               ml="2"
               mr="2"
               borderRadius="full"
@@ -83,14 +85,35 @@ const LocationCardsMenu = (props) => {
               onPress={toggleTimePress}
             >
               <MaterialIcons name="access-time" size={24} color="black" />
-            </Pressable>
+            </Pressable> */}
           </HStack>
         </HStack>
-        <ScrollView horizontal={true} h="300" w="100%">
-          {props.listings.map((marker) => {
-            return <Card key={marker._id} markerObj={marker}></Card>;
-          })}
-        </ScrollView>
+        {props.listings.length > 0 ? (
+          <ScrollView horizontal={true} h="300" w="100%">
+            {props.listings.map((marker) => {
+              return <Card key={marker._id} markerObj={marker}></Card>;
+            })}
+          </ScrollView>
+        ) : (
+          <Box h="300" w="100%" py={4} alignItems="center">
+            <Text mb={10} fontSize={20}>
+              {" "}
+              Looks like there are no listings around you..
+            </Text>
+            <NavigationLink to={"/NewListing"}>
+              <Center
+                w="100%"
+                shadow={3}
+                bg="white"
+                borderColor="gray"
+                p={2}
+                borderRadius={1000}
+              >
+                <MaterialIcons name="add-location-alt" size={54} color="gray" />
+              </Center>
+            </NavigationLink>
+          </Box>
+        )}
       </BlurView>
     </Box>
   );
@@ -101,8 +124,9 @@ export default LocationCardsMenu;
 const Card = (props) => {
   const [itemAmount, setItemAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const {setRenderNow} =  useContext(RenderContext)
-  const cardToast = useToast()
+  const { setRenderNow } = useContext(RenderContext);
+  const [loading, setLoading] = useState(false);
+  const cardToast = useToast();
 
   const itemsLeft = Array.from(
     { length: props.markerObj.number_of_items + 1 },
@@ -118,36 +142,32 @@ const Card = (props) => {
   const lon = props.markerObj.location.coordinates[0];
   const navLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
-  const updateAmount = (listingId)=> {
-    
-    
-    const newAmount = parseInt(props.markerObj.number_of_items) - itemAmount
+  const updateAmount = (listingId) => {
+    setLoading(true)
+    const newAmount = parseInt(props.markerObj.number_of_items) - itemAmount;
     // console.log(props.markerObj.number_of_items, itemAmount, newAmount, listingId )
     //const updatedAmount = {number_of_items: newAmount};
-    axios.put(
-        `https://trade-bench-server.onrender.com/listings/${listingId}`,
-        {
-          number_of_items: newAmount,
-        }
-      )
+    axios
+      .put(`https://trade-bench-server.onrender.com/listings/${listingId}`, {
+        number_of_items: newAmount,
+      })
       .then((response) => {
-       // console.log(response);
+        // console.log(response);
+        setLoading(false)
         setShowModal(false);
-        setRenderNow(response)
-        
+        setRenderNow(response);
+
         cardToast.show({
           title: "Sucssess",
           variant: "subtle",
           placement: "top",
           description: "The listing will be updated shortly",
-        })
-
+        });
       })
       .catch((error) => {
         console.error(error);
       });
-
-  }
+  };
 
   const formatDate = (date) => {
     const dateString = date;
@@ -170,8 +190,11 @@ const Card = (props) => {
   };
 
   const removeListing = (listingId) => {
+    setLoading(true)
+    setItemAmount(true)
     const updatedStatus = "disabled";
-    axios.put(
+    axios
+      .put(
         `https://trade-bench-server.onrender.com/listings/status/${listingId}`,
         {
           status: updatedStatus,
@@ -180,13 +203,14 @@ const Card = (props) => {
       .then((response) => {
         //console.log(response);
         setShowModal(false);
-        setRenderNow(response)
+        setLoading(false)
+        setRenderNow(response);
         cardToast.show({
           title: "Sucssess",
           variant: "subtle",
           placement: "top",
           description: "The listing will be removed from the list shortly",
-        })
+        });
       })
       .catch((error) => {
         console.error(error);
@@ -306,12 +330,35 @@ const Card = (props) => {
         safeAreaTop={true}
       >
         <Modal.Content w="100%" h="100%">
+          {loading ? (
+            <Box
+              bg="rgba(255,255,255,0.5)"
+              top={0}
+              left={0}
+              display="absolute"
+              w="100%"
+              h="100%"
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="row"
+            >
+              <Spinner size="lg" mr={5}></Spinner>
+              <Text fontSize={20} color="cyan.500">
+                {" "}
+                Updating..{" "}
+              </Text>
+            </Box>
+          ) : null}
+
           <Modal.CloseButton />
           <Modal.Header>Listing Info</Modal.Header>
           <Modal.Body>
+            <Center flex={1} px={3}>
+              <StatusBar />
+            </Center>
             <AspectRatio w="100%" ratio={16 / 9} mb={5}>
               <Image
-                borderRadius="5"
+                borderRadius={5}
                 source={{
                   uri: props.markerObj.images[0],
                 }}
@@ -332,58 +379,69 @@ const Card = (props) => {
               Last Updated: {formatDate(props.markerObj.updatedAt)}{" "}
             </Text>
 
-            <VStack mt={25} borderWidth={1} borderColor="emerald.500"  pb={2} borderRadius={5} alignItems="center">
-              <Text fontSize="lg" mb={5} py="5" w="100%" bg="emerald.100" textAlign="center" borderRadiusTop={5}>
+            <VStack
+              mt={25}
+              borderWidth={1}
+              borderColor="emerald.500"
+              pb={2}
+              borderRadius={5}
+              alignItems="center"
+            >
+              <Text
+                fontSize="lg"
+                mb={5}
+                py={5}
+                w="100%"
+                bg="emerald.100"
+                textAlign="center"
+                borderRadiusTop={5}
+              >
                 How many items are you taking?
               </Text>
               <VStack w="85%" mb={5}>
-
-              <FormControl mb={5}>
+                <FormControl mb={5}>
                   <Select
-                  backgroundColor="muted.100"
-                  height="50"
-                  accessibilityLabel="How many items?"
-                  value={1}
-                  onValueChange={(value) => setItemAmount(value)}
-                  _selectedItem={{
-                    bg: "teal.200",
-                    endIcon: <CheckIcon size={5} />,
-                  }}
-                >
-                  {itemsLeft.map((item, index) => {
-                    return (
-                      <Select.Item
-                        key={index}
-                        label={String(index)}
-                        value={String(index)}
-                      />
-                    );
-                  })}
+                    backgroundColor="muted.100"
+                    height="50"
+                    accessibilityLabel="How many items?"
+                    value={1}
+                    onValueChange={(value) => setItemAmount(value)}
+                    _selectedItem={{
+                      bg: "teal.200",
+                      endIcon: <CheckIcon size={5} />,
+                    }}
+                  >
+                    {itemsLeft.map((item, index) => {
+                      return (
+                        <Select.Item
+                          key={index}
+                          label={String(index)}
+                          value={String(index)}
+                        />
+                      );
+                    })}
                   </Select>
                 </FormControl>
                 <Pressable
-                // w="150"
-                h="50"
-                flexDirection="row"
-                alignItems="center"
-                bg="emerald.300"
-                borderWidth="2"
-                borderColor="emerald.400"
-                borderRadius="5"
-                pl="1"
-                _pressed={{ bg: "emerald.500" }}
-                onPress={() => {
-                updateAmount(props.markerObj._id);
-              }}
-              >
-                <AntDesign name="tagso" size={24} color="text.900" />
-                <Text> Grab Items </Text>
+                  // w="150"
+                  h="50"
+                  flexDirection="row"
+                  alignItems="center"
+                  bg="emerald.300"
+                  borderWidth="2"
+                  borderColor="emerald.400"
+                  borderRadius="5"
+                  pl="1"
+                  _pressed={{ bg: "emerald.500" }}
+                  onPress={() => {
+                    updateAmount(props.markerObj._id);
+                  }}
+                >
+                  <AntDesign name="tagso" size={24} color="text.900" />
+                  <Text> Grab Items </Text>
                 </Pressable>
-
-               
               </VStack>
             </VStack>
-
           </Modal.Body>
           <Modal.Footer justifyContent="space-between" h="20">
             <Link
