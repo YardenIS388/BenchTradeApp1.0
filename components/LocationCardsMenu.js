@@ -12,249 +12,476 @@ import {
   Image,
   Badge,
   Modal,
-  Button
+  FormControl,
+  Select,
+  Button,
+  Skeleton,
+  VStack,
+  Link,
+  useToast,
+  CheckIcon,
+  Spinner,
+  StatusBar,
 } from "native-base";
-import { BlurView } from 'expo-blur';
-import { useState, useEffect } from "react";
-import { FontAwesome, MaterialIcons, AntDesign} from "@expo/vector-icons";
-import sortedMarkers from "../sortedLocations.json"
-import notSortedMarkers from "../fakeLocations.json"
+import { BlurView } from "expo-blur";
+import { Link as NavigationLink } from "@react-navigation/native";
+import { useState, useEffect, useContext } from "react";
+import {
+  FontAwesome,
+  MaterialIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import { RenderContext } from "../context/authentication.context";
+import axios from "axios";
 
 const LocationCardsMenu = (props) => {
-
   const [isTimePressed, setTimePressed] = useState(false);
   const [isLocationPressed, setLocationPressed] = useState(false);
-  const [markersList, setMarkersList] = useState(notSortedMarkers)
 
-  //filter buttons UI state 
-  const toggleTimePress = () => { 
-        
-        if(isLocationPressed){
-            setLocationPressed(false)
-        }
-        setTimePressed((previousState) => !previousState)
-      }
+  //const [markersList, setMarkersList] = useState(props.listings);
+
+  //filter buttons UI state
+  const toggleTimePress = () => {
+    if (isLocationPressed) {
+      setLocationPressed(false);
+    }
+    setTimePressed((previousState) => !previousState);
+  };
   const toggleLocationPress = () => {
-          if(isTimePressed){
-              setTimePressed(false)
-          }
-         setLocationPressed((previousState) => !previousState)
-  }
+    if (isTimePressed) {
+      setTimePressed(false);
+    }
+    setLocationPressed((previousState) => !previousState);
+  };
 
-useEffect(()=>{
-  if(isTimePressed){
-    setMarkersList(sortedMarkers)
-  } else {
-    setMarkersList(notSortedMarkers)
-  }
-})
+  useEffect(() => {}, [props.listings]);
 
   return (
-    // <Center>
-    //   <Pressable onPress={onOpen} position="absolute" bottom="50" borderRadius="full" bg="white" borderWidth="1" borderColor="light.200" p="3" shadow="4">
-    //       <MaterialCommunityIcons name="view-carousel-outline" size={50} color="black" />
-    //   </Pressable>
-    //   <Actionsheet isOpen={isOpen} onClose={onClose} >
-    //     <Actionsheet.Content>
-   
-          <Box  position="absolute" bottom="0" bg="rgba(255,255,255,0.5)">
-            <BlurView intasity="20">
-            <HStack
-              justifyContent="space-between"
-              p="3"
+    <Box position="absolute" w="100%" bottom="0" bg="rgba(255,255,255,0.5)">
+      <BlurView intasity="20">
+        <HStack justifyContent="space-between" p="3">
+          <Heading>Around You</Heading>
+          <HStack borderRadius="full">
+            {/* <Pressable
+              ml="2"
+              mr="2"
+              borderRadius="full"
+              p="1"
+              _pressed={{ bg: "white" }}
+              isPressed={isLocationPressed}
+              onPress={toggleLocationPress}
             >
-              <Heading>Around You</Heading>
-              <HStack borderRadius="full">
-                <Pressable ml="2" mr='2' borderRadius="full" p="1"
-                            _pressed={{bg:'white'}}
-                            isPressed={isLocationPressed}
-                           onPress={toggleLocationPress}
-                            >
-                  <MaterialIcons
-                    name="my-location"
-                    size={24}
-                    color="black.100"
-                  />
-                </Pressable>
-                <Pressable ml="2" mr="2" borderRadius="full" p="1"
-                           _pressed={{bg:'white'}}
-                           _focus={{bg:'emerald.200'}}
-                           isPressed={isTimePressed}
-                           onPress={toggleTimePress}
-                            >
-                  <MaterialIcons 
-                    name="access-time" 
-                    size={24} 
-                    color="black" />
-                </Pressable>
-              </HStack>
-            </HStack>
-            <ScrollView horizontal={true}>
-              {markersList.map((marker) => {
-                return <Card key={marker.id} markerObj={marker}></Card>;
-              })}
-            </ScrollView>
-           </BlurView>
+              <MaterialIcons name="my-location" size={24} color="black.100" />
+            </Pressable>
+            <Pressable
+              ml="2"
+              mr="2"
+              borderRadius="full"
+              p="1"
+              _pressed={{ bg: "white" }}
+              _focus={{ bg: "emerald.200" }}
+              isPressed={isTimePressed}
+              onPress={toggleTimePress}
+            >
+              <MaterialIcons name="access-time" size={24} color="black" />
+            </Pressable> */}
+          </HStack>
+        </HStack>
+        {props.listings.length > 0 ? (
+          <ScrollView horizontal={true} h="300" w="100%">
+            {props.listings.map((marker) => {
+              return <Card key={marker._id} markerObj={marker}></Card>;
+            })}
+          </ScrollView>
+        ) : (
+          <Box h="300" w="100%" py={4} alignItems="center">
+            <Text mb={10} fontSize={20}>
+              {" "}
+              Looks like there are no listings around you..
+            </Text>
+            <NavigationLink to={"/NewListing"}>
+              <Center
+                w="100%"
+                shadow={3}
+                bg="white"
+                borderColor="gray"
+                p={2}
+                borderRadius={1000}
+              >
+                <MaterialIcons name="add-location-alt" size={54} color="gray" />
+              </Center>
+            </NavigationLink>
           </Box>
-          
-
-//         </Actionsheet.Content>
-//       </Actionsheet>
-//     </Center>
-   )
- }
+        )}
+      </BlurView>
+    </Box>
+  );
+};
 
 export default LocationCardsMenu;
 
 const Card = (props) => {
-
+  const [itemAmount, setItemAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const { setRenderNow } = useContext(RenderContext);
+  const [loading, setLoading] = useState(false);
+  const cardToast = useToast();
+
+  const itemsLeft = Array.from(
+    { length: props.markerObj.number_of_items + 1 },
+    (_, i) => i
+  );
   const onCardPress = (e) => {
-    setShowModal(true)
-    console.log(props.markerObj.id)
-    console.log( e.target)
+    setShowModal(true);
+    // console.log(props.markerObj);
+    // console.log(props.markerObj._id);
+    // console.log(e.target);
   };
-  const now = new Date();
+  const lat = props.markerObj.location.coordinates[1];
+  const lon = props.markerObj.location.coordinates[0];
+  const navLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
+  const updateAmount = (listingId) => {
+    setLoading(true)
+    const newAmount = parseInt(props.markerObj.number_of_items) - itemAmount;
+    // console.log(props.markerObj.number_of_items, itemAmount, newAmount, listingId )
+    //const updatedAmount = {number_of_items: newAmount};
+    axios
+      .put(`https://trade-bench-server.onrender.com/listings/${listingId}`, {
+        number_of_items: newAmount,
+      })
+      .then((response) => {
+        // console.log(response);
+        setLoading(false)
+        setShowModal(false);
+        setRenderNow(response);
+
+        cardToast.show({
+          title: "Sucssess",
+          variant: "subtle",
+          placement: "top",
+          description: "The listing will be updated shortly",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const formatDate = (date) => {
+    const dateString = date;
+    const dateObject = new Date(dateString);
+    const formattedDate = dateObject.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    return formattedDate;
+  };
+
+  const getDiffInHours = (dateString) => {
+    const dateObject = new Date(dateString);
+    const currentDate = new Date();
+    const diffInMilliseconds = currentDate - dateObject;
+    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    return diffInHours;
+  };
+
+  const removeListing = (listingId) => {
+    setLoading(true)
+    setItemAmount(true)
+    const updatedStatus = "disabled";
+    axios
+      .put(
+        `https://trade-bench-server.onrender.com/listings/status/${listingId}`,
+        {
+          status: updatedStatus,
+        }
+      )
+      .then((response) => {
+        //console.log(response);
+        setShowModal(false);
+        setLoading(false)
+        setRenderNow(response);
+        cardToast.show({
+          title: "Sucssess",
+          variant: "subtle",
+          placement: "top",
+          description: "The listing will be removed from the list shortly",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <>
-    <Pressable alignItems="center" ml="4" onPress={onCardPress} mb="5">
-      <Box
-        maxW="80"
-        w="200"
-        h="300"
-        rounded="lg"
-        overflow="hidden"
-        borderColor="coolGray.200"
-        borderWidth="1"
-        _dark={{
-          borderColor: "coolGray.600",
-          backgroundColor: "gray.700",
+      <Pressable
+        alignItems="center"
+        ml="4"
+        onPress={() => {
+          setShowModal(true);
         }}
-        _web={{
-          shadow: 2,
-          borderWidth: 0,
-        }}
-        _light={{
-          backgroundColor: "gray.50",
-        }}
+        mb="5"
       >
-        <Box>
-          <AspectRatio w="100%" ratio={16 / 9}>
-            <Image
-              //TODO: update to actual img uri
-              source={{
-                uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg",
-              }}
-              alt="image"
-            />
-          </AspectRatio>
-          <Center
-            m="2"
-            borderRadius="100"
-            bg="emerald.500"
-            _dark={{
-              bg: "emerald.400",
-            }}
-            _text={{
-              color: "warmGray.50",
-              fontWeight: "700",
-              fontSize: "xs",
-            }}
-            position="absolute"
-            bottom="0"
-            px="3"
-            py="1.5"
-          >
-            <HStack justifyContent="center" alignItems="center">
-              <FontAwesome name="location-arrow" size={14} color="black" />
-              <Text> 0.6 km </Text>
-            </HStack>
-          </Center>
-        </Box>
-        <Stack p="4" space={3}>
-          <Stack space={2}>
-            <Heading size="sm" ml="-1">
-              {props.markerObj.name}
-            </Heading>
-            <Text
-              fontSize="xs"
-              _light={{
-                color: "emerald.500",
-              }}
-              _dark={{
-                color: "emerald.400",
-              }}
-              fontWeight="500"
-              ml="-0.5"
-              mt="-1"
-            >
-              {props.markerObj.username}
-            </Text>
-          </Stack>
-          <HStack>
-            {props.markerObj.categories.map((category, index) => {
-              return (
-                <Badge
-                  h="6"
-                  m="1"
-                  key={index}                
-                  variant="outline"
-                  colorScheme="emerald"
-                >
-                  {category}
-                </Badge>
-              )
-            })}
-          </HStack>
-          <HStack alignItems="center" space={4} justifyContent="space-between">
-            <HStack alignItems="center">
-              <Text
-                color="coolGray.600"
-                _dark={{
-                  color: "warmGray.200",
+        <Box
+          maxW="80"
+          w="200"
+          h="300"
+          rounded="lg"
+          overflow="hidden"
+          borderColor="coolGray.200"
+          borderWidth="1"
+          _dark={{
+            borderColor: "coolGray.600",
+            backgroundColor: "gray.700",
+          }}
+          _web={{
+            shadow: 2,
+            borderWidth: 0,
+          }}
+          _light={{
+            backgroundColor: "gray.50",
+          }}
+        >
+          <Box>
+            <AspectRatio w="100%" ratio={16 / 9}>
+              <Image
+                source={{
+                  uri: props.markerObj.images[0],
                 }}
-                fontWeight="400"
-              >
-                {now - (props.markerObj.created_at / 1000) * 60 * 60 * 24} days
-                ago
-              </Text>
+                alt="image"
+              />
+            </AspectRatio>
+            <Center
+              m="2"
+              borderRadius="100"
+              bg="emerald.500"
+              _dark={{
+                bg: "emerald.400",
+              }}
+              _text={{
+                color: "warmGray.50",
+                fontWeight: "700",
+                fontSize: "xs",
+              }}
+              position="absolute"
+              bottom="0"
+              px="3"
+              py="1.5"
+            >
+              <HStack justifyContent="center" alignItems="center">
+                <FontAwesome name="location-arrow" size={14} color="white" />
+                <Text color="light.100">
+                  {" "}
+                  {Math.floor(props.markerObj.distance)} m{" "}
+                </Text>
+              </HStack>
+            </Center>
+          </Box>
+          <Stack p="4" space={3}>
+            <Stack space={2}>
+              <Heading size="sm" ml="-1">
+                From: {formatDate(props.markerObj.createdAt)}
+              </Heading>
+              <Text>{getDiffInHours(props.markerObj.createdAt)} hours ago</Text>
+            </Stack>
+            <HStack>
+              {props.markerObj.tags.map((category, index) => {
+                return (
+                  <Badge
+                    h="6"
+                    m="1"
+                    key={index}
+                    variant="outline"
+                    colorScheme="emerald"
+                  >
+                    {category}
+                  </Badge>
+                );
+              })}
             </HStack>
-          </HStack>
-        </Stack>
-      </Box>
-    </Pressable>
-    <Modal isOpen={showModal} onClose={() => setShowModal(false)} safeAreaTop={true} >
-        <Modal.Content w="100%" h="100%"> 
+            <HStack
+              alignItems="center"
+              space={4}
+              justifyContent="space-between"
+            >
+              <HStack alignItems="center">
+                <Text
+                  color="coolGray.600"
+                  _dark={{
+                    color: "warmGray.200",
+                  }}
+                  fontWeight="400"
+                >
+                  {props.markerObj.number_of_items} items
+                </Text>
+              </HStack>
+            </HStack>
+          </Stack>
+        </Box>
+      </Pressable>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        safeAreaTop={true}
+      >
+        <Modal.Content w="100%" h="100%">
+          {loading ? (
+            <Box
+              bg="rgba(255,255,255,0.5)"
+              top={0}
+              left={0}
+              display="absolute"
+              w="100%"
+              h="100%"
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="row"
+            >
+              <Spinner size="lg" mr={5}></Spinner>
+              <Text fontSize={20} color="cyan.500">
+                {" "}
+                Updating..{" "}
+              </Text>
+            </Box>
+          ) : null}
+
           <Modal.CloseButton />
           <Modal.Header>Listing Info</Modal.Header>
           <Modal.Body>
-          
-          <AspectRatio w="100%" ratio={16 / 9}>
-            <Image
-              borderRadius="5"
-              //TODO: update to actual img uri
-              source={{
-                uri: "https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg",
-              }}
-              alt="image"
-            />
-          </AspectRatio>
-          <Heading>
-           {props.markerObj.name}
-          </Heading>
-          <Text>Dsitance: 0.2 km away </Text>
-          <Text>Last Updated: {props.markerObj.created_at}  </Text>
+            <Center flex={1} px={3}>
+              <StatusBar />
+            </Center>
+            <AspectRatio w="100%" ratio={16 / 9} mb={5}>
+              <Image
+                borderRadius={5}
+                source={{
+                  uri: props.markerObj.images[0],
+                }}
+                alt="image"
+              />
+            </AspectRatio>
+            <Heading mt="2">
+              Listing From: {formatDate(props.markerObj.createdAt)}
+            </Heading>
+            <Text mt="2" fontSize="lg">
+              {" "}
+              Distance: {Math.floor(props.markerObj.distance)}m away{" "}
+            </Text>
+            <Text mt="2" fontSize="lg">
+              Amount: {props.markerObj.number_of_items}{" "}
+            </Text>
+            <Text mt="2" fontSize="lg">
+              Last Updated: {formatDate(props.markerObj.updatedAt)}{" "}
+            </Text>
+
+            <VStack
+              mt={25}
+              borderWidth={1}
+              borderColor="emerald.500"
+              pb={2}
+              borderRadius={5}
+              alignItems="center"
+            >
+              <Text
+                fontSize="lg"
+                mb={5}
+                py={5}
+                w="100%"
+                bg="emerald.100"
+                textAlign="center"
+                borderRadiusTop={5}
+              >
+                How many items are you taking?
+              </Text>
+              <VStack w="85%" mb={5}>
+                <FormControl mb={5}>
+                  <Select
+                    backgroundColor="muted.100"
+                    height="50"
+                    accessibilityLabel="How many items?"
+                    value={1}
+                    onValueChange={(value) => setItemAmount(value)}
+                    _selectedItem={{
+                      bg: "teal.200",
+                      endIcon: <CheckIcon size={5} />,
+                    }}
+                  >
+                    {itemsLeft.map((item, index) => {
+                      return (
+                        <Select.Item
+                          key={index}
+                          label={String(index)}
+                          value={String(index)}
+                        />
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+                <Pressable
+                  // w="150"
+                  h="50"
+                  flexDirection="row"
+                  alignItems="center"
+                  bg="emerald.300"
+                  borderWidth="2"
+                  borderColor="emerald.400"
+                  borderRadius="5"
+                  pl="1"
+                  _pressed={{ bg: "emerald.500" }}
+                  onPress={() => {
+                    updateAmount(props.markerObj._id);
+                  }}
+                >
+                  <AntDesign name="tagso" size={24} color="text.900" />
+                  <Text> Grab Items </Text>
+                </Pressable>
+              </VStack>
+            </VStack>
           </Modal.Body>
           <Modal.Footer justifyContent="space-between" h="20">
-              <Pressable w="30%" h="90%" flexDirection="row" alignItems="center" bg="emerald.300" borderWidth="2" borderColor="emerald.500" borderRadius="5" pl="1">
-                  <AntDesign name="tagso" size={24} color="text.900" />
-                  <Text> Grab Item </Text>
-              </Pressable>
-              <Pressable w="30%" h="90%"  flexDirection="row" alignItems="center" bg="red.300" borderWidth="2" borderColor="red.400" borderRadius="5" pl="1">
-                  <MaterialIcons name="block" size={22} color="black" />
-                  <Text> Not There </Text>
-              </Pressable>
+            <Link
+              href={navLink}
+              bg="primary.100"
+              w="32%"
+              h="90%"
+              color="black"
+              justifyContent="center"
+              alignItems="center"
+              borderColor="primary.400"
+              borderWidth="2"
+              rounded="sm"
+              _pressed={{ bg: "primary.500" }}
+            >
+              <MaterialCommunityIcons
+                name="navigation-variant-outline"
+                size={22}
+                color="black"
+              />
+              Navigate
+            </Link>
+            <Pressable
+              w="32%"
+              h="90%"
+              flexDirection="row"
+              alignItems="center"
+              bg="red.300"
+              borderWidth="2"
+              borderColor="red.400"
+              borderRadius="5"
+              pl="1"
+              _pressed={{ bg: "red.500" }}
+              onPress={() => {
+                removeListing(props.markerObj._id);
+              }}
+            >
+              <MaterialIcons name="block" size={22} color="black" />
+              <Text> Not There </Text>
+            </Pressable>
           </Modal.Footer>
         </Modal.Content>
       </Modal>

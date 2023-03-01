@@ -1,7 +1,16 @@
 {
   "expo": {
-    "name": "BenchTradeApp1.0",
-    "slug": "BenchTradeApp1.0",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos so you can show your friends where you left your listings"
+        }
+      ]
+    ],
+    "name": "BenchTradeApp",
+    "slug": "BenchTradeApp",
+    "description": "A location based app to help you share items you no longer need with people around you, leave an item at a convinient place, snap a photo and let the magic happen!" , 
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
