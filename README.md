@@ -29,6 +29,7 @@ fork the master branch from https://github.com/YardenIS388/BenchTradeApp1.0/tree
 
 run:
 ```bash
+npm install
 npx expo start --tunnel
 ```
 ## On IOS:
