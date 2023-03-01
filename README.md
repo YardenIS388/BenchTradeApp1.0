@@ -12,53 +12,46 @@ Project Structure:
 Screens - Screens are components that reprsent one view in our screen stack. navigation is implemnted with React Navigation. 
 routes  - includes the homeStack component which is a stack navigator component
 components - unit components in the system 
+# TradeBench - Frontend 
+
+A Mobile app for sharing second hand items
 
 
-## Backend
-### How to run the server
-1. Go to server directory:
-```
-cd server
-```
-2. Install NPM packages:
-```
-npm i
-```
-3. Create a .env file with the following constants:
-      * NODE_ENV=#
-      * DB_USER=#
-      * DB_PASSWORD=#
-      * DB_NAME=#
-      * PORT=#
-      
-4. Run the server:
-```
-npm run dev
-```
 
-### Important packages
-  - **express-async-errors** - no need in try/catch blocks inside controllers, only error throwing
-  - **fastest-validator** - validates entity information
-  - **morgan** - http calls logger
-  - **winston** - error logger
-  
-  
-  
-  
-## Front-end
-### How to run the server
-1. Go to root directory:
-```
-2. Install NPM packages:
-```
- npx expo install
-```
-      
-4. Run the react-native app:
-```
-npm start / yarn
-```
+## Before installation 
 
-### Important message 
-This react-native project was created using the expo cli 
+Download the Expo Go app and sign up. 
+ 
 
+## Installation and usage 
+
+fork the master branch from https://github.com/YardenIS388/BenchTradeApp1.0/tree/master
+
+run:
+```bash
+npx expo start --tunnel
+```
+## On IOS:
+
+Open the camera app and scan the QR code 
+
+## On Andoroid:
+Open the Expo Go app and scan the QR code 
+
+
+## How to use with a simulator:
+** note that location services and camera module will not work on a simulator! it is best to run the app on a mobile device whenever possible. 
+
+Android Studio: 
+Open the android studio simulator and hit the 'a' key on the terminal. 
+
+xcode simulator: 
+Open application menu on your mac 
+right click on the xcode shortcut and hit 'Package Content' 
+go to Developer Applications>Simulator and open it 
+hit the 'i' key on the terminal 
+
+
+
+## that is it! 
+now all there is left to do is enjoy our app. 
